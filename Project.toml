@@ -1,0 +1,13 @@
+name = "UnfoldBIDS"
+uuid = "b54e767b-1ebd-4480-ac2a-f5f4d8853074"
+authors = ["Rene Skukies", "Benedikt Ehinger", "Jan Haas"]
+version = "0.1.0"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[compat]
+julia = "1.7"
+
+[targets]
+test = ["Test"]
