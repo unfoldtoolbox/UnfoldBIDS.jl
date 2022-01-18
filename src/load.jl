@@ -44,7 +44,7 @@ end
 
 ####################################################################################################
 
-function loadRaw(currentLoc,fileEnding, drop_events, bfDict, epochedFormulas, interesting_channels)
+function loadRaw(currentLoc,fileEnding, drop_events)
 
     if fileEnding == "set"
         # EEGLab data
@@ -66,13 +66,14 @@ function loadRaw(currentLoc,fileEnding, drop_events, bfDict, epochedFormulas, in
             append!(evts,row_frame);
         end
     end
+    return evts_set, evts, data, sfreq, 
+end 
 
+function populateRaw(raw, chan_types::Dict, montage::String, bfDict, epochedFormulas, interesting_channels)
     # copied from the test for topoplot of UnfoldMakie
     #-------------------------------------------------------------------------------------------------
-    raw.set_channel_types(Dict(:AMMO=>"misc",:HEALTH=>"misc",:PLAYERX=>"misc",:PLAYERY=>"misc",
-                                :WALLABOVE=>"misc",:WALLBELOW=>"misc",
-                                :CLOSESTENEMY=>"misc",:CLOSESTSTAR=>"misc"))
-    raw.set_montage("standard_1020")
+    raw.set_channel_types(chan_types)
+    raw.set_montage(montage)
     layout_from_raw = PyMNE.channels.make_eeg_layout(get_info(raw))
     positions = layout_from_raw.pos
     ix = sortperm(positions[:,2])
@@ -116,5 +117,5 @@ function loadRaw(currentLoc,fileEnding, drop_events, bfDict, epochedFormulas, in
 
     raw.close();
 
-    return evts_set, evts, data, sfreq, interesting_channel_names, positions
+    return interesting_channel_names, positions
 end

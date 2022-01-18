@@ -5,7 +5,7 @@
 
 # extends the given basis function dictionary and formula array by respective
 # matching elements for events not yet found there
-function makeBasicFormulasAndFunctions!(bfDict,epochedFormulas,evts_set,tau)
+function addDefaultEventformulas!(bfDict,epochedFormulas,evts_set,tau=(-0.4, 0.8))
     for e in evts_set
         if !haskey(bfDict,e)
             bfDict[e] = (term(0) ~ term(1),firbasis(τ=tau, sfreq=500, name=e));
