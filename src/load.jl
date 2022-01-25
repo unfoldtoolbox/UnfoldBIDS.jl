@@ -4,9 +4,6 @@
 
 # L178 populate ... => in own helper function.
 
-# file loading
-using PyMNE, CSVFiles, DelimitedFiles
-
 ####################################################################################################
 
 # i.set file loading
@@ -66,7 +63,7 @@ function loadRaw(currentLoc,fileEnding, drop_events)
             append!(evts,row_frame);
         end
     end
-    return evts_set, evts, data, sfreq, 
+    return evts_set, evts, data, sfreq
 end 
 
 function populateRaw(raw, chan_types::Dict, montage::String, bfDict, epochedFormulas, interesting_channels)

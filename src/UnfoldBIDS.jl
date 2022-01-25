@@ -1,5 +1,12 @@
 module UnfoldBIDS
 
+# Export list
+export laodRaw
+export populateRaw
+export addDefaultEventformulas!
+export epochedFit
+
+
 # basics
 using StatsModels, MixedModels, DataFrames, Statistics
 # file loading

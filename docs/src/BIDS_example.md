@@ -65,14 +65,14 @@ positions = nothing;
 # For now use all channels
 if isempty(interesting_channels) interesting_channels = [1:63;]; end;
 
-for s in subs
-for t in tasks
-for r in runs
+# for s in subs
+# for t in tasks
+# for r in runs
 
 #for testing purposes; also comment in/out the triple "end" at the end of the Using Unfold part
-#s = subs[1];
-#t = tasks[1];
-#r = runs[1];
+s = subs[1];
+t = tasks[1];
+r = runs[1];
 
 # fun with bids
 currentLoc = loc * "/sub-" * s * "/eeg/sub-" * s * "_task-" * t * "_run-" * r;
@@ -150,9 +150,9 @@ global results_e = vcat(results_e,res_e,cols=:union);
 
 
 # the triple "end" at the end of the Using Unfold part
-end #runs
-end #tasks
-end #subs
+# end #runs
+# end #tasks
+# end #subs
 
 # -----------------------------------------------------------------------------------------------------------------
 #  Filtering and grouping the results

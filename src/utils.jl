@@ -30,7 +30,7 @@ function pickChannels(ch_names,interesting_channels)
                 push!(interesting_channel_names,c);
                 push!(interesting_channel_indizes,index);
             else
-                print(c * " was not a valid channel name, skipping it.");
+                @warn c * " was not a valid channel name, skipping it.";
             end
         elseif typeof(c) == Int64
             push!(interesting_channel_indizes,c);
