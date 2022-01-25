@@ -12,7 +12,7 @@ function addDefaultEventformulas!(bfDict,epochedFormulas,evts_set,tau=(-0.4, 0.8
         end
 
         if findfirst(x -> term(e) in x.rhs, epochedFormulas) === nothing
-        push!(epochedFormulas, term(0) ~ term(0) + term(e));
+            push!(epochedFormulas, term(0) ~ term(0) + term(e));
         end
     end
     return nothing
@@ -36,7 +36,7 @@ function pickChannels(ch_names,interesting_channels)
             push!(interesting_channel_indizes,c);
             push!(interesting_channel_names,ch_names[c]);
         else
-            print(c * " was not recognized as a valid channel, skipping it.");
+            @warn c * " was not a valid channel name, skipping it.";
         end
     end
     return interesting_channel_indizes, interesting_channel_names

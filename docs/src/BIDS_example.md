@@ -4,6 +4,7 @@
 TODO: Make one Subject into tar file (including BIDS structure)
     Usage: make tar.gz archive of data; upload to repo; make entry in Artifacts.toml with create_artifact, bind_artifact and artifact_hash
 
+## Parameter setting
 First we need to set some basic Parameter, like the path to our Data:
 ```julia
 
@@ -22,6 +23,8 @@ runs = ["02"];
 # as well as the file type used to store the eeg data, denoted by its file ending (without the dot)
 fileEnding = "vhdr";
 ```
+
+
 As well as which data we are actually interested in:
 
 ```julia
@@ -48,13 +51,9 @@ basic_mapping = mapping(:colname_basis => "Time from Event (s)",:estimate => "Es
 # for a larger number of channels, laying out the plots gets incredibly slow, so only execute manually what you need
 auto_render_cutoff = 3;
 ```
-
+## Script work
 Now we can start processing our data
 ```julia
-
-#-----------------------------------------------------------------------------------------------------------------
-#  Script start
-# -----------------------------------------------------------------------------------------------------------------
 
 
 results_r = DataFrame();
@@ -63,7 +62,7 @@ results_e = DataFrame();
 positions = nothing;
 
 # For now use all channels
-if isempty(interesting_channels) interesting_channels = [1:63;]; end;
+# if isempty(interesting_channels) interesting_channels = [1:63;]; end;
 
 # for s in subs
 # for t in tasks
@@ -85,13 +84,9 @@ bfDict = Dict{String,Tuple{FormulaTerm, Unfold.BasisFunction}}(
 # define custom formulas and basisfunctions here, all events without one will later be
 #  assigned a default (@formula( 0 ~ 1 ), firbasis(τ=(-0.4, .8), sfreq=raw.info["sfreq"], name=evt_name))
 
-# examples (the formulas used in the accompanying thesis)
+# examples
 #"PLAYER_CRASH_ENEMY" => (@formula( 0 ~ 1 + HEALTH ),firbasis(τ=tau, sfreq=500, name="PLAYER_CRASH_ENEMY")),
-#"PLAYER_CRASH_WALL" => (@formula( 0 ~ 1 + HEALTH), firbasis(τ=tau, sfreq=500, name="PLAYER_CRASH_WALL")),
-#"COLLECT_AMMO" => (@formula( 0 ~ 1 + AMMO), firbasis(τ=tau, sfreq=500, name="COLLECT_AMMO")),
-#"MISSILE_HIT_ENEMY" => (@formula( 0 ~ 1 + CLOSESTENEMY ),firbasis(τ=tau, sfreq=500, name="MISSILE_HIT_ENEMY")),
-#"SHOOT_BUTTON" => (@formula( 0 ~ 1 + AMMO), firbasis(τ=tau, sfreq=500, name="SHOOT_BUTTON")),
-#"COLLECT_STAR" => (@formula( 0 ~ 1 + HEALTH), firbasis(τ=tau, sfreq=500, name="COLLECT_STAR"))
+#"PLAYER_CRASH_WALL" => (@formula( 0 ~ 1 + HEALTH), firbasis(τ=tau, sfreq=500, name="PLAYER_CRASH_WALL"))
 
 );  #bfDict end
 
@@ -111,8 +106,17 @@ epochedFormulas = [
 #  Raw Data Processing
 # -----------------------------------------------------------------------------------------------------------------
 
-evts_set, evts, raw_data, sfreq, interesting_channel_names, positions_temp = 
-    processRaw(currentLoc, fileEnding, drop_events, bfDict, epochedFormulas, interesting_channels);
+evts_set, evts, raw_data, sfreq = loadRaw(currentLoc, fileEnding, drop_events);
+
+##
+chan_types = Dict(:AMMO=>"misc",:HEALTH=>"misc",
+                    :PLAYERX=>"misc", :PLAYERY=>"misc",
+                    :WALLABOVE=>"misc",:WALLBELOW=>"misc",
+                    :CLOSESTENEMY=>"misc",:CLOSESTSTAR=>"misc")
+
+motage = "standard_1020"
+##
+interesting_channel_names, positions = populateRaw(raw_data, chan_types, montage, bfDict, epochedFormulas, interesting_channels)
 
 #convert data to μV from Volt to undermine possible underflows in the later calculation
 #raw_data does only contain the interesting_channels specified, so unless one specified a stim channel, this simple line is enough
@@ -126,11 +130,12 @@ end
 #  Formulas and Functions 2
 # -----------------------------------------------------------------------------------------------------------------
 
-makeBasicFormulasAndFunctions!(bfDict,epochedFormulas,evts_set,tau); # This should be changed into addDefaultEventformulas
+addDefaultEventFormulas!(bfDict,epochedFormulas,evts_set,tau); # This should be changed into addDefaultEventformulas
 
-# -----------------------------------------------------------------------------------------------------------------
-#  Using Unfold to find the ERPs we are looking for
-# -----------------------------------------------------------------------------------------------------------------
+```
+
+## Using Unfold to get ERPS
+```julia
 
 # regression-based analysis fits all ERPs at once
 _, res_r = fit(UnfoldLinearModel, bfDict, evts, raw_data, eventcolumn="event");
@@ -154,9 +159,10 @@ global results_e = vcat(results_e,res_e,cols=:union);
 # end #tasks
 # end #subs
 
-# -----------------------------------------------------------------------------------------------------------------
-#  Filtering and grouping the results
-# -----------------------------------------------------------------------------------------------------------------
+```
+
+##  Filtering and grouping the results
+```julia
 
 # if covariates were used (Intercept is not the only term), group by term as well, don't compare with epoched results etc.
 covariates_used = length(Set(results_r.term))>1;
@@ -187,9 +193,11 @@ if !covariates_used
 
     prepped = vcat(prepped_r,prepped_e);
 end
-# -----------------------------------------------------------------------------------------------------------------
-#  Plotting the results
-# -----------------------------------------------------------------------------------------------------------------
+```
+
+## Plotting the Results
+
+```julia
 # --> once the script is done, call fg_r, fg_e or fg in the Julia REPL to look at your results in a new window
 #  (or the old window incase you already looked at something and didn't close it!)
 
