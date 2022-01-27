@@ -138,7 +138,8 @@ addDefaultEventFormulas!(bfDict,epochedFormulas,evts_set,tau); # This should be 
 ```julia
 
 # regression-based analysis fits all ERPs at once
-_, res_r = fit(UnfoldLinearModel, bfDict, evts, raw_data, eventcolumn="event");
+uf = fit(UnfoldModel, bfDict, evts, raw_data, eventcolumn="event");
+res_r = coeftable(uf)
 res_r.channel = [interesting_channel_names[i] for i in res_r.channel];
 
 # epoch-based analysis needs to fit every ERP separately and was therefore outsourced into the accompanying library
