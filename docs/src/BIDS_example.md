@@ -21,6 +21,7 @@ tasks = ["ContinuousVideoGamePlay"];
 runs = ["02"];
 
 # as well as the file type used to store the eeg data, denoted by its file ending (without the dot)
+# TODO: change to .set
 fileEnding = "vhdr";
 ```
 

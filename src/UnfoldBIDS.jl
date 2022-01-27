@@ -14,7 +14,7 @@ using PyMNE, CSVFiles, DelimitedFiles
 # unfold
 using Unfold
 # plotting
-using AlgebraOfGraphics, GLMakie
+using AlgebraOfGraphics, CairoMakie
 
 # Loading
 include("load.jl")
