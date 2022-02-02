@@ -17,6 +17,10 @@ Unfold = "181c99d8-e21b-4ff3-b70b-c233eddec679"
 
 [compat]
 PyMNE = "0.1"
+MixedModels = "4"
+StatsModels = "0.6"
+CairoMakie = "0.7"
+
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
