@@ -1,7 +1,7 @@
 module UnfoldBIDS
 
 # Export list
-export loadRaw
+export laodRaw
 export populateRaw
 export addDefaultEventformulas!
 export epochedFit
