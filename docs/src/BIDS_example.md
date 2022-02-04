@@ -9,7 +9,7 @@ First we need to set some basic Parameter, like the path to our Data:
 ```julia
 
 # the base bids folder, ...
-loc = "./Data/";
+loc = "../../../data/8bit/derivatives/logs_added";
 
 # the subjects involved, ...
 subs = ["001"];
@@ -21,8 +21,8 @@ tasks = ["ContinuousVideoGamePlay"];
 runs = ["02"];
 
 # as well as the file type used to store the eeg data, denoted by its file ending (without the dot)
+# TODO: change to .set
 fileEnding = "vhdr";
-
 ```
 
 
@@ -53,8 +53,10 @@ basic_mapping = mapping(:colname_basis => "Time from Event (s)",:estimate => "Es
 auto_render_cutoff = 3;
 ```
 ## Script work
-Now we can initialize processing our data
+Now we can start processing our data
 ```julia
+
+
 results_r = DataFrame();
 results_e = DataFrame();
 
@@ -63,42 +65,44 @@ positions = nothing;
 # For now use all channels
 # if isempty(interesting_channels) interesting_channels = [1:63;]; end;
 
+# for s in subs
+# for t in tasks
+# for r in runs
 
-#for testing purposes we will only run one subject
-# TODO: Change to use two subjects
+#for testing purposes; also comment in/out the triple "end" at the end of the Using Unfold part
 s = subs[1];
 t = tasks[1];
 r = runs[1];
 
-
-# Compute location of current dataset; "_eeg." will be automatically appendet by the load function.
+# fun with bids
 currentLoc = loc * "/sub-" * s * "/eeg/sub-" * s * "_task-" * t * "_run-" * r;
-```
-##  Formulas and Functions 1
-Here we can define custom formulas, t around the event and frequencies which Unfold should use to estimate specific events. If no input is given Events will be assigned the default values:
 
-@formula 0 ~ 1\
-t = (-0.4, 0.8)\
-frequ = raw.info["sfreq"]
+# -----------------------------------------------------------------------------------------------------------------
+#  Formulas and Functions 1
+# -----------------------------------------------------------------------------------------------------------------
 
-An example entry in the dict of how to assign custom settings with a covariate would look like this:\
-"EventA" => (@formula( 0 ~ 1 + Covariate), firbasis(τ=(-0.4, .8), sfreq=500, name =  "EventA")
-
-```julia
 bfDict = Dict{String,Tuple{FormulaTerm, Unfold.BasisFunction}}(
-);  #bfDict end
-```
+# define custom formulas and basisfunctions here, all events without one will later be
+#  assigned a default (@formula( 0 ~ 1 ), firbasis(τ=(-0.4, .8), sfreq=raw.info["sfreq"], name=evt_name))
 
-Additionally, if you want to compare results of non overlap corrected analysis with the overlap corrected estimates by unfold you can define the needed formulas as well.\
-All events not present will be assigned to `term(0) ~ term(0) + term(evt_name)`by default.\
-\
-**NOTE:** Because of code simplicity all formulas should have at least two terms on the right hand side. Example: `@formula(0 ~ 0 + Covariate)`
-```julia
+# examples
+#"PLAYER_CRASH_ENEMY" => (@formula( 0 ~ 1 + HEALTH ),firbasis(τ=tau, sfreq=500, name="PLAYER_CRASH_ENEMY")),
+#"PLAYER_CRASH_WALL" => (@formula( 0 ~ 1 + HEALTH), firbasis(τ=tau, sfreq=500, name="PLAYER_CRASH_WALL"))
+
+);  #bfDict end
+
 epochedFormulas = [
+# define custom formulas for epoch-based analysis here; all events not present in a formula will later
+#  be assigned a default term(0) ~ term(0) + term(evt_name)
+# note that for code simplicity, all formulas should have at least two terms on the right side,
+#  even if as in the given examples, one is 0
+
+# examples
+#@formula(0 ~ 0 + COLLECT_AMMO),
+#@formula(0 ~ 0 + SHOOT_BUTTON)
 
 ];  #epochedFormulas end
 ```
-
 
 ##  Raw Data Processing
 
@@ -123,9 +127,9 @@ if positions === nothing
     global positions = positions_temp;
 end
 
-# ---
+# -----------------------------------------------------------------------------------------------------------------
 #  Formulas and Functions 2
-# ---
+# -----------------------------------------------------------------------------------------------------------------
 
 addDefaultEventFormulas!(bfDict,epochedFormulas,evts_set,tau); # This should be changed into addDefaultEventformulas
 
