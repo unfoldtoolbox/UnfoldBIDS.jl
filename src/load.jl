@@ -63,10 +63,10 @@ function loadRaw(currentLoc,fileEnding, drop_events)
             append!(evts,row_frame);
         end
     end
-    return evts_set, evts, data, sfreq
+    return evts_set, evts, raw, sfreq
 end 
 
-function populateRaw(raw, chan_types::Dict, montage::String, bfDict, epochedFormulas, interesting_channels)
+function populateRaw(raw, chan_types::Dict, montage::String, bfDict, epochedFormulas, interesting_channels, evts_set, evts)
     # copied from the test for topoplot of UnfoldMakie
     #-------------------------------------------------------------------------------------------------
     raw.set_channel_types(chan_types)

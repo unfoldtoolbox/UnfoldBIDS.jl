@@ -97,11 +97,12 @@ All events not present will be assigned to `term(0) ~ term(0) + term(evt_name)`b
 epochedFormulas = [
 
 ];  #epochedFormulas end
+```
 
-# ---
-#  Raw Data Processing
-# ---
 
+##  Raw Data Processing
+
+```julia
 evts_set, evts, raw_data, sfreq = loadRaw(currentLoc, fileEnding, drop_events);
 
 ##
@@ -110,9 +111,9 @@ chan_types = Dict(:AMMO=>"misc",:HEALTH=>"misc",
                     :WALLABOVE=>"misc",:WALLBELOW=>"misc",
                     :CLOSESTENEMY=>"misc",:CLOSESTSTAR=>"misc")
 
-motage = "standard_1020"
+montage = "standard_1020"
 ##
-interesting_channel_names, positions = populateRaw(raw_data, chan_types, montage, bfDict, epochedFormulas, interesting_channels)
+interesting_channel_names, positions = populateRaw(raw_data, chan_types, montage, bfDict, epochedFormulas, interesting_channels, evts_set, evts)
 
 #convert data to μV from Volt to undermine possible underflows in the later calculation
 #raw_data does only contain the interesting_channels specified, so unless one specified a stim channel, this simple line is enough
@@ -150,11 +151,6 @@ insertcols!(res_e, ([:subject,:task,:run] .=> (s,t,r))...);
 global results_r = vcat(results_r,res_r,cols=:union);
 global results_e = vcat(results_e,res_e,cols=:union);
 
-
-# the triple "end" at the end of the Using Unfold part
-# end #runs
-# end #tasks
-# end #subs
 
 ```
 
