@@ -2,10 +2,26 @@
 # Rene Todo: Rename makeBasicFormulasAndFunctions => addDefaultEventformulas? 
 
 ####################################################################################################
+function BIDSpath(loc, task=nothing, run=nothing)
+    # TODO: Implement to find task and run
+    sub_paths = glob("sub*", loc)
+    
+    subs = String[]
+    for s in sub_paths
+        tmp = split(s, "sub-")
+        subs = append!(subs, [tmp[2]])
+    end
+# for all occurences[m.match for m = eachmatch(pat, str)]
+    return subs
+end
 
+#loc * "/sub-" * s * "/eeg/sub-" * s * "_task-" * t * "_run-" * r;
+
+
+####################################################################################################
 # extends the given basis function dictionary and formula array by respective
 # matching elements for events not yet found there
-function addDefaultEventformulas!(bfDict,epochedFormulas,evts_set,tau=(-0.4, 0.8))
+function addDefaultEventFormulas!(bfDict,epochedFormulas,evts_set,tau=(-0.4, 0.8))
     for e in evts_set
         if !haskey(bfDict,e)
             bfDict[e] = (term(0) ~ term(1),firbasis(τ=tau, sfreq=500, name=e));

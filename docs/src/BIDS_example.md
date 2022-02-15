@@ -4,6 +4,11 @@
 TODO: Make one Subject into tar file (including BIDS structure)
     Usage: make tar.gz archive of data; upload to repo; make entry in Artifacts.toml with create_artifact, bind_artifact and artifact_hash
 
+```julia
+using Unfold, UnfoldBIDS
+using DataFrames
+```
+
 ## Parameter setting
 First we need to set some basic Parameter, like the path to our Data:
 ```julia
@@ -21,7 +26,6 @@ tasks = ["ContinuousVideoGamePlay"];
 runs = ["02"];
 
 # as well as the file type used to store the eeg data, denoted by its file ending (without the dot)
-# TODO: change to .set
 fileEnding = "vhdr";
 ```
 
@@ -77,35 +81,27 @@ r = runs[1];
 
 # fun with bids
 currentLoc = loc * "/sub-" * s * "/eeg/sub-" * s * "_task-" * t * "_run-" * r;
-
-# -----------------------------------------------------------------------------------------------------------------
+```
+---
 #  Formulas and Functions 1
-# -----------------------------------------------------------------------------------------------------------------
+---
+If you've read the main Unfold documentation you know that we will need to specify basis functions for the different events. This can be done like below.\
+Note that we will pass an empty dict, which results in all events getting the default values `(@formula( 0 ~ 1 ), firbasis(τ=(-0.4, .8), sfreq=raw.info["sfreq"], name=evt_name))` assigned.\
+An example entry would look like this: `"EventA" => (@formula( 0 ~ 1 + Covariate ),firbasis(τ=tau, sfreq=500, name="EventA"))`
 
+
+The same goes for the epoched based analysis, where the default corresponds to `term(0) ~ term(0) + term(evt_name)`\
+Note that for code simplicity all formulas should have at least two terms on the right side, even if one is 0, as in this example: `@formula(0 ~ 0 + EventA)`
+```julia
 bfDict = Dict{String,Tuple{FormulaTerm, Unfold.BasisFunction}}(
-# define custom formulas and basisfunctions here, all events without one will later be
-#  assigned a default (@formula( 0 ~ 1 ), firbasis(τ=(-0.4, .8), sfreq=raw.info["sfreq"], name=evt_name))
-
-# examples
-#"PLAYER_CRASH_ENEMY" => (@formula( 0 ~ 1 + HEALTH ),firbasis(τ=tau, sfreq=500, name="PLAYER_CRASH_ENEMY")),
-#"PLAYER_CRASH_WALL" => (@formula( 0 ~ 1 + HEALTH), firbasis(τ=tau, sfreq=500, name="PLAYER_CRASH_WALL"))
-
 );  #bfDict end
 
 epochedFormulas = [
-# define custom formulas for epoch-based analysis here; all events not present in a formula will later
-#  be assigned a default term(0) ~ term(0) + term(evt_name)
-# note that for code simplicity, all formulas should have at least two terms on the right side,
-#  even if as in the given examples, one is 0
-
-# examples
-#@formula(0 ~ 0 + COLLECT_AMMO),
-#@formula(0 ~ 0 + SHOOT_BUTTON)
-
 ];  #epochedFormulas end
 ```
 
 ##  Raw Data Processing
+Now let's load the raw data and add additional information to get it into a format that Unfold can work with.
 
 ```julia
 evts_set, evts, raw_data, sfreq = loadRaw(currentLoc, fileEnding, drop_events);
@@ -118,7 +114,10 @@ chan_types = Dict(:AMMO=>"misc",:HEALTH=>"misc",
 
 montage = "standard_1020"
 ##
-interesting_channel_names, positions = populateRaw(raw_data, chan_types, montage, bfDict, epochedFormulas, interesting_channels, evts_set, evts)
+interesting_channel_names, positions = populateRaw(
+    raw_data, chan_types, montage, bfDict, 
+    epochedFormulas, interesting_channels, 
+    evts_set, evts)
 
 #convert data to μV from Volt to undermine possible underflows in the later calculation
 #raw_data does only contain the interesting_channels specified, so unless one specified a stim channel, this simple line is enough
@@ -128,11 +127,11 @@ if positions === nothing
     global positions = positions_temp;
 end
 
-# -----------------------------------------------------------------------------------------------------------------
+# ---
 #  Formulas and Functions 2
-# -----------------------------------------------------------------------------------------------------------------
+# ---
 
-addDefaultEventFormulas!(bfDict,epochedFormulas,evts_set,tau); # This should be changed into addDefaultEventformulas
+addDefaultEventFormulas!(bfDict,epochedFormulas,evts_set,tau); 
 
 ```
 
@@ -144,7 +143,7 @@ uf = fit(UnfoldModel, bfDict, evts, raw_data, eventcolumn="event");
 res_r = coeftable(uf)
 res_r.channel = [interesting_channel_names[i] for i in res_r.channel];
 
-# epoch-based analysis needs to fit every ERP separately and was therefore outsourced into the accompanying library
+# epoch-based analysis
 res_e = epochedFit(UnfoldLinearModel,epochedFormulas,evts,raw_data,tau,sfreq);
 res_e.channel = [interesting_channel_names[i] for i in res_e.channel];
 
@@ -217,45 +216,4 @@ if length(interesting_channels) <= auto_render_cutoff
     end
 end
 
-# just "if false" makes the IDE complain
-if true == false
-    # only run needed lines manually if you want to save/load a plot or result etc.
-    save("results_r_all.csv", results_r);
-    save("results_e_all.csv", results_e);
-    writedlm("positions.csv", positions);
-    global results_r = DataFrame(load("results_r_all.csv"));
-    global results_e = DataFrame(load("results_e_all.csv"));
-    global positions = readdlm("positions.csv", Float64);
-    save("output/Cz_epoched_allSubs.png", fg_e);
-    save("output/Cz_compare_allSubs_short.png", fg);
-    save("output/Cz_covariates_allSubs_short.png", fg_r);
-
-    # manipulating the data into the shape needed for testing the topoplot beta
-    combined_r_part = combined_r[combined_r.basisname .== "SHOOT_BUTTON", :];
-    combined_r_part = combined_r_part[combined_r_part.colname_basis .== .28, :];
-    fg_tr, _ = topoplot(combined_r_part.estimate,positions=positions);
-    combined_e_part = combined_e[combined_e.term .== "SHOOT_BUTTON", :];
-    combined_e_part = combined_e_part[combined_e_part.colname_basis .== 0, :];
-    fg_te, _ = topoplot(combined_e_part.estimate,positions=positions);
-    fg_test, _ = topoplot([1:63;],positions=positions);
-
-    # for getting the complete data cut down after loading it from file
-    combined_e = combined_e[combined_e.channel .== "Cz",:];
-    results_r = results_r[results_r.channel .== "Cz",:];
-    results_e = results_e[results_e.channel .== "Cz",:];
-
-    # for ordering the epoched plot just as Cavanagh had
-    # (at the point of writing this script, only alphabetical ordering was possible)
-    nameDict = Dict(
-        "PLAYER_CRASH_ENEMY" => "5: CRASH_ENEMY",
-        "MISSILE_HIT_ENEMY" => "6: MISSILE_HIT",
-        "COLLECT_STAR" => "2: COLLECT_STAR",
-        "SHOOT_BUTTON" => "1: SHOOT_BUTTON",
-        "PLAYER_CRASH_WALL" => "4: CRASH_WALL",
-        "COLLECT_AMMO" => "3: COLLECT_AMMO"
-    );
-    combined_e.term = [nameDict[i] for i in combined_e.term];
-    combined_r.basisname = [nameDict[i] for i in combined_r.basisname];
-    prepped.basisname_term = [nameDict[i] for i in prepped.basisname_term];
-end
 ```

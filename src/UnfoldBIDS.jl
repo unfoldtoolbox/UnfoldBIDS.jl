@@ -3,7 +3,7 @@ module UnfoldBIDS
 # basics
 using StatsModels, MixedModels, DataFrames, Statistics
 # file loading
-using PyMNE, CSVFiles, DelimitedFiles
+using PyMNE, CSVFiles, DelimitedFiles, Glob
 # unfold
 using Unfold
 # plotting
@@ -15,10 +15,12 @@ include("load.jl")
 include("utils.jl")
 
 # Export list
-export loadRaw
+export BIDSpath, loadRaw
 export populateRaw
 export addDefaultEventformulas!
 export epochedFit
 
+import StatsModels.FormulaTerm # for exporting
+export FormulaTerm
 
 end
