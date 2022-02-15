@@ -1,4 +1,4 @@
-# Move the example code from unfold_bids.jl here
+# Working example of Unfold BIDS
 => Add an Artifact of one 8-bit subject (maybe downsamples, less channels to save space) using Artifacts.jl (dont ask Bene, but explain it to him how it works ;-)).
 
 TODO: Make one Subject into tar file (including BIDS structure)
@@ -26,15 +26,16 @@ fileEnding = "vhdr";
 ```
 
 
-As well as which data we are actually interested in:
+As well as which data we are actually interested in. 
+
+Passing an empty array would in using all 63 channels of the example dataset.\
+**Note**: This is no real "choose all channels" behaviour yet. Will be implemented in the future.
+
+
 
 ```julia
 # Channel
-# an empty array results in channels 1:63 being processed (the data channels in the dataset used 
-# with this script originally)
-# able to handle both integer indizes (for example produced by a range like 10:20;) as well as  
-# channel name Strings like "Cz"
-# (a mix like [1:4;"Fz";"Cz";63] works as well)
+
 interesting_channels = ["Cz"];
 
 # events that should be ignored due to e.g. low sample size

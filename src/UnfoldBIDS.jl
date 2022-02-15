@@ -1,12 +1,5 @@
 module UnfoldBIDS
 
-# Export list
-export loadRaw
-export populateRaw
-export addDefaultEventformulas!
-export epochedFit
-
-
 # basics
 using StatsModels, MixedModels, DataFrames, Statistics
 # file loading
@@ -20,5 +13,12 @@ using AlgebraOfGraphics, CairoMakie
 include("load.jl")
 # Various utils
 include("utils.jl")
+
+# Export list
+export loadRaw
+export populateRaw
+export addDefaultEventformulas!
+export epochedFit
+
 
 end
