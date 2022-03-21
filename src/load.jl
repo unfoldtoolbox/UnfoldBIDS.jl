@@ -13,7 +13,7 @@ function loadRawSet(currentLoc,fileEnding,drop_events)
     sfreq = raw.info["sfreq"];
     evts_set = filter(x -> x ∉ drop_events,collect(Set(a["description"] for a in raw.annotations)));
     evts = DataFrame();
-    for a in annotations
+    for a in raw.annotations
         row_frame = DataFrame(:latency => floor(Int, a["onset"] * sfreq), :event => a["description"]);
         append!(evts,row_frame);
     end
