@@ -6,8 +6,7 @@ using StatsModels, MixedModels, DataFrames, Statistics
 using PyMNE, CSVFiles, DelimitedFiles, Glob
 # unfold
 using Unfold
-# plotting
-using AlgebraOfGraphics, CairoMakie
+
 
 # Loading
 include("load.jl")

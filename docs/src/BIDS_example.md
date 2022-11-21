@@ -14,10 +14,10 @@ First we need to set some basic Parameter, like the path to our Data:
 ```julia
 
 # the base bids folder, ...
-loc = "../../../data/8bit/derivatives/logs_added";
+loc = datadep"EEG8bit"
 
 # the subjects involved, ...
-subs = ["001"];
+subs = ["001","002","003"];
 
 # the tasks performed, ...
 tasks = ["ContinuousVideoGamePlay"];

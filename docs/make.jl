@@ -1,6 +1,9 @@
 using UnfoldBIDS
 using Documenter
 
+using DataDeps
+include("dataDeps.jl")
+
 DocMeta.setdocmeta!(UnfoldBIDS, :DocTestSetup, :(using UnfoldBIDS); recursive=true)
 
 makedocs(;
