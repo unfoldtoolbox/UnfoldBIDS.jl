@@ -1,1 +1,3 @@
 # UnfoldBIDS [![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://reneskukies.github.io/UnfoldBIDS.jl/stable) [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://reneskukies.github.io/UnfoldBIDS.jl/dev) [![Build Status](https://github.com/reneskukies/UnfoldBIDS.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/reneskukies/UnfoldBIDS.jl/actions/workflows/CI.yml?query=branch%3Amain) [![Coverage](https://codecov.io/gh/reneskukies/UnfoldBIDS.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/reneskukies/UnfoldBIDS.jl)
+
+Sub/Wrapper-Package of Unfold.jl. Ultimately it should provide the means to automatically load a Dataset in BIDS format and apply unfold-style processing to it. 
