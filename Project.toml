@@ -20,10 +20,11 @@ Unfold = "181c99d8-e21b-4ff3-b70b-c233eddec679"
 
 [compat]
 CSVFiles = "1"
+CairoMakie = "0.7, 0.9"
 DataFrames = "1"
 Glob = "1"
 MixedModels = "4"
-PyMNE = "0.1"
+PyMNE = "0.1, 0.2"
 Revise = "3"
 StatsModels = "0.6"
 Unfold = "0.3"
