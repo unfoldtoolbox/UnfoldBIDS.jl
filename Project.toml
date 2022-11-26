@@ -19,6 +19,7 @@ StatsModels = "3eaba693-59b7-5ba5-a881-562e759f1c8d"
 Unfold = "181c99d8-e21b-4ff3-b70b-c233eddec679"
 
 [compat]
+ArtifactUtils = "0.2"
 CSVFiles = "1"
 CairoMakie = "0.7, 0.9"
 DataFrames = "1"
