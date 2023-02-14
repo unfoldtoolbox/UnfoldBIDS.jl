@@ -25,6 +25,6 @@ df = rununfold(bids,formula=xy,channels=xy,[basisfunction=FIR | taus = [-0.3,1.]
   18 │ S18      Unfold-Type: UnfoldLinearModel \…
   19 │ S19      Unfold-Type: UnfoldLinearModel \…
   20 │ S20      Unfold-Type: UnfoldLinearModel 
-
+https://www.s-ccs.de/ClusterDepth.jl/dev/tutorials/eeg/
 
 ```
