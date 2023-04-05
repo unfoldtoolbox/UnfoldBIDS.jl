@@ -21,6 +21,7 @@ Unfold = "181c99d8-e21b-4ff3-b70b-c233eddec679"
 [compat]
 CSVFiles = "1"
 CairoMakie = "0.7, 0.9"
+DataDeps = "0.7"
 DataFrames = "1"
 Glob = "1"
 MixedModels = "4"
