@@ -19,15 +19,19 @@ StatsModels = "3eaba693-59b7-5ba5-a881-562e759f1c8d"
 Unfold = "181c99d8-e21b-4ff3-b70b-c233eddec679"
 
 [compat]
+ArtifactUtils = "0.2"
 CSVFiles = "1"
 CairoMakie = "0.7, 0.9"
+DataDeps = "0.7"
 DataFrames = "1"
 Glob = "1"
 MixedModels = "4"
 PyMNE = "0.1, 0.2"
 Revise = "3"
-StatsModels = "0.6"
+
+StatsModels = "0.6, 0.7""
 Unfold = "0.3, 0.4"
+
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
