@@ -3,7 +3,7 @@
 #function rununfold(eeg_df,formula=xy,channels=xy,[basisfunction=FIR | taus = [-0.3,1.] ,...)
 
 
-
+#=
 lm = []
 resultsAll = DataFrame()
 
@@ -18,3 +18,4 @@ for row in eachrow(eeg_df)
     append!(resultsAll,resOne)
     append!(lm,[lmSub])
 end
+=#
