@@ -7,6 +7,7 @@ version = "0.1.0"
 ArtifactUtils = "8b73e784-e7d8-4ea5-973d-377fed4e3bce"
 Artifacts = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
 CSVFiles = "5d742f6a-9f54-50ce-8119-2520741973ca"
+CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
 DataDeps = "124859b0-ceae-595e-8997-d05f6a7a8dfe"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 DelimitedFiles = "8bb1440f-4735-579b-a4ab-409b98df4dab"
@@ -21,17 +22,14 @@ Unfold = "181c99d8-e21b-4ff3-b70b-c233eddec679"
 [compat]
 ArtifactUtils = "0.2"
 CSVFiles = "1"
-CairoMakie = "0.7, 0.9"
 DataDeps = "0.7"
 DataFrames = "1"
 Glob = "1"
 MixedModels = "4"
 PyMNE = "0.1, 0.2"
 Revise = "3"
-
-StatsModels = "0.6, 0.7""
+StatsModels = "0.6, 0.7"
 Unfold = "0.3, 0.4"
-
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
