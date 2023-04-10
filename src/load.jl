@@ -122,7 +122,7 @@ function load_bids_eeg_data(layout_df)
 #-----------------------------------------------------------------------------------------------
 
 # Function loading BIDS data directly by calling BidsLayout
-#=function load_bids_eeg_data(BIDSPath::AbstractString;
+function load_bids_eeg_data(BIDSPath::AbstractString;
 							derivative::Bool=true,
 							specificFolder::Union{Nothing,AbstractString}=nothing,
 							excludeFolder::Union{Nothing,AbstractString}=nothing,
@@ -130,7 +130,7 @@ function load_bids_eeg_data(layout_df)
 							run::Union{Nothing,AbstractString}=nothing)
 
 	    # Find all EEG data files in the BIDS directory
-		layout_df = BidsLayout(BIDSPath=BIDSPath;
+	#=	layout_df = BidsLayout(BIDSPath=BIDSPath;
 								derivative=derivative,
 								specificFolder=specificFolder,
 								excludeFolder=excludeFolder,
@@ -141,14 +141,15 @@ function load_bids_eeg_data(layout_df)
 	    eeg_df = DataFrame()
 	
 	    # Loop through each EEG data file
-	    for row in eachrow(path_df)
-			file_path = row.path *"/" * row.file
-			
+	    for row in eachrow(layout_df)
+			file_path = joinpath(row.path,row.file)
+			@printf("Loading subject %s at:\n %s \n",row.subject, file_path)
+
 	        # Read in the EEG data as a dataframe using the appropriate reader
 	        if endswith(file_path, ".edf")
-	            eeg_data = PyMNE.io.read_raw_edf(file_path)
+	            eeg_data = PyMNE.io.read_raw_edf(file_path, verbose="ERROR")
 	        elseif endswith(file_path, ".vhdr")
-	            eeg_data = PyMNE.io.read_raw_brainvision(file_path)
+	            eeg_data = PyMNE.io.read_raw_brainvision(file_path, verbose="ERROR")
 	        elseif endswith(file_path, ".fif")
 	            eeg_data = PyMNE.io.read_raw_fif(file_path, verbose="ERROR")
 			elseif endswith(file_path, ".set")
@@ -162,11 +163,12 @@ function load_bids_eeg_data(layout_df)
 	        #subject_id, task_id = match(r"sub-(.+)_task-(.*)_eeg", basename(file_path)).captures
 	        #eeg_data.subject_id .= subject_id
 	        #eeg_data.task_id .= task_id
-	        
-			append!(eeg_df, eeg_data)
+	        tmp_df = DataFrame(subject = row.subject, data = eeg_data)
+
+			append!(eeg_df, tmp_df)
 	    end
 	
 	    # Return the combined EEG data dataframe
-	    #return eeg_df
+	    return eeg_df
 	end
-	=#
+=#
