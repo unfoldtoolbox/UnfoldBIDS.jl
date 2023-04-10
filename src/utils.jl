@@ -1,44 +1,20 @@
-function BidsLayout(BIDSPath::AbstractString;
-    derivative::Bool=true,
-    dFolder::String="",
-    exFolder::String="raw",
-    task::Union{Nothing,AbstractString}=nothing,
-    run::Union{Nothing,AbstractString}=nothing)
+# Apply Unfold 
 
-    # Any files with these endings will be returned
-    file_pattern = ["eeg", "set", "fif", "vhdr", "edf"]
+#function rununfold(eeg_df,formula=xy,channels=xy,[basisfunction=FIR | taus = [-0.3,1.] ,...)
 
-    if task === nothing
-        @warn "No task provided, will load all tasks!!"
-    else
-        file_pattern = push!(file_pattern, "task-" * task)
-    end
 
-    if run === nothing
-        @warn "No run provided, will load all runs!!"
-    else
-        file_pattern = push!(file_pattern, "run-" * run)
-    end
 
-    # Exclude these folders when using raw data
-    exclude = ["derivatives", exFolder]
+lm = []
+resultsAll = DataFrame()
 
-    # Should a subfolder of derivatives be used?
-    derivativeFolder = "derivatives/" * dFolder
+for row in eachrow(eeg_df)
+    data = pyconvert(AbstractArray,row.data.get_data())
+    data = data.*1e6
 
-    files_df = DataFrame(subject=[], file=[], path=[])  # Initialize an empty DataFrame to hold results
+    lmSub = fit(UnfoldModel,design_lm,eventsList[ix],data)
 
-    for (root, dirs, files) in walkdir(BIDSPath)
-        for file in files
-            if sum(occursin.(file_pattern, file)) >= 2 &&
-               ((derivative && occursin(derivativeFolder, root)) ||
-                (!derivative && !any(occursin.(exclude, root))))
-
-                sub_string = match(r"sub-\d{3}", file)
-                sub = last(sub_string.match, 3)
-                push!(files_df, (sub, file, root))
-            end
-        end
-    end
-    return files_df
+    resOne = coeftable(lmSub)
+    resOne.subject .= subject
+    append!(resultsAll,resOne)
+    append!(lm,[lmSub])
 end

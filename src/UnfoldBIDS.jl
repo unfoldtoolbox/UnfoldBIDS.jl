@@ -1,7 +1,7 @@
 module UnfoldBIDS
 
 # basics
-using StatsModels, MixedModels, DataFrames, Statistics
+using StatsModels, MixedModels, DataFrames, Statistics, Printf
 # file loading
 #using PyMNE, CSVFiles, DelimitedFiles, Glob
 using PyMNE
@@ -10,7 +10,7 @@ using Unfold
 
 
 # Loading
-# include("load.jl")
+include("load.jl")
 # Various utils
 include("utils.jl")
 
