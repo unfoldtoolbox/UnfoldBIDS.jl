@@ -122,7 +122,7 @@ function load_bids_eeg_data(layout_df)
 #-----------------------------------------------------------------------------------------------
 
 # Function loading BIDS data directly by calling BidsLayout
-function load_bids_eeg_data(BIDSPath::AbstractString;
+#=function load_bids_eeg_data(BIDSPath::AbstractString;
 							derivative::Bool=true,
 							specificFolder::Union{Nothing,AbstractString}=nothing,
 							excludeFolder::Union{Nothing,AbstractString}=nothing,
@@ -130,7 +130,7 @@ function load_bids_eeg_data(BIDSPath::AbstractString;
 							run::Union{Nothing,AbstractString}=nothing)
 
 	    # Find all EEG data files in the BIDS directory
-	#=	layout_df = BidsLayout(BIDSPath=BIDSPath;
+		layout_df = BidsLayout(BIDSPath=BIDSPath;
 								derivative=derivative,
 								specificFolder=specificFolder,
 								excludeFolder=excludeFolder,
