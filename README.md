@@ -1,5 +1,33 @@
 # UnfoldBIDS [![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://reneskukies.github.io/UnfoldBIDS.jl/stable) [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://reneskukies.github.io/UnfoldBIDS.jl/dev) [![Build Status](https://github.com/reneskukies/UnfoldBIDS.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/reneskukies/UnfoldBIDS.jl/actions/workflows/CI.yml?query=branch%3Amain) [![Coverage](https://codecov.io/gh/reneskukies/UnfoldBIDS.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/reneskukies/UnfoldBIDS.jl)
 
+## Current Functionality
+
+```julia
+using UnfoldBIDS
+
+# To look up the paths of all subjects and store in a Dataframe:
+layout_df = BidsLayout(BIDSPath::AbstractString; # Path to BIDS root folder
+                     derivative::Bool=true, # Do you want to us the derivative/ processed data? Default = true
+                     specificFolder::Union{Nothing,AbstractString}=nothing, # If you want a specific folder in derivatives or root specify here
+                     excludeFolder::Union{Nothing,AbstractString}=nothing, # You can exclude specific folders when not looking for a specific sub-folder 
+                     task::Union{Nothing,AbstractString}=nothing, # Specify task; will load all tasks if not specified
+                     run::Union{Nothing,AbstractString}=nothing) # Specify run; will load all runs if not specified
+           
+# To load all data into memory/ one dataframe:           
+eeg_df = load_bids_eeg_data(layout_df::DataFrame)
+
+3×2 DataFrame
+ Row │ subject    data                              
+     │ SubStrin…  Py                                
+─────┼──────────────────────────────────────────────
+   1 │ 005        <RawEEGLAB | sub-005_ses-001_tas…
+   2 │ 006        <RawEEGLAB | sub-006_ses-001_tas…
+   3 │ 007        <RawEEGLAB | sub-007_ses-001_tas…
+
+
+```
+
+
 Sub/Wrapper-Package of Unfold.jl. Ultimately it should provide the means to automatically load a Dataset in BIDS format and apply unfold-style processing to it. 
 
 ## UnfoldBIDS Quickstart
