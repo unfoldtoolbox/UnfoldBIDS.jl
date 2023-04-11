@@ -122,7 +122,8 @@ function load_bids_eeg_data(layout_df)
 #-----------------------------------------------------------------------------------------------
 
 # Function loading BIDS data directly by calling BidsLayout
-#=function load_bids_eeg_data(BIDSPath::AbstractString;
+#=
+function load_bids_eeg_data(BIDSPath::AbstractString;
 							derivative::Bool=true,
 							specificFolder::Union{Nothing,AbstractString}=nothing,
 							excludeFolder::Union{Nothing,AbstractString}=nothing,
