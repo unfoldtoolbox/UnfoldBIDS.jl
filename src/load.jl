@@ -10,6 +10,13 @@ function BidsLayout(BIDSPath::AbstractString;
     nPattern = 2
 
     # Extend file pattern
+	if ses === nothing
+        @warn "No session provided, will load all sessions!!"
+    else
+        file_pattern = push!(file_pattern, "ses-" * ses)
+        nPattern += 1
+    end
+	
     if task === nothing
         @warn "No task provided, will load all tasks!!"
     else
