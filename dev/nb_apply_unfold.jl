@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.22
+# v0.19.26
 
 using Markdown
 using InteractiveUtils
@@ -8,6 +8,7 @@ using InteractiveUtils
 begin
 	using Unfold
 	using PyMNE
+	using CSV
 end
 
 # ╔═╡ 0fd23ebc-f473-4fdf-a286-3b6dca35c597
@@ -29,7 +30,7 @@ function BidsLayout(BIDSPath::AbstractString;
 
     # Extend file pattern
 	if ses === nothing
-        @warn "No task provided, will load all tasks!!"
+        @warn "No session provided, will load all sessions!!"
     else
         file_pattern = push!(file_pattern, "ses-" * ses)
         nPattern += 1
@@ -141,14 +142,75 @@ function load_bids_eeg_data(layout_df)
 	    return eeg_df
 	end
 
+# ╔═╡ eaf920bd-68de-41f2-bca1-cbbb5d936942
+function CollectEvents(Subjects, CSVPath::String, delim::String)
+	AllEvents = DataFrame()
+	for sub in Subjects
+		events = CSV.read(Printf.format(Printf.Format(CSVPath),sub),DataFrame, delim=delim)
+		events.Subject .= sub
+		append!(AllEvents, events)
+	end
+	return AllEvents
+end
+
+# ╔═╡ 6d340958-14dd-4aca-bd9b-765ef37faba6
+let
+	events = CSV.read(@sprintf("/store/data/non-bids/MSc_EventDuration/relevantEvents/%s_finalEvents.csv",sub),DataFrame, delim=",")
+	# add latency (event onsets in samples)
+	events.latency = (events.latency ./ 256) .* 250
+end
+
+# ╔═╡ a28d4044-f8eb-4155-8d61-f1adc91edea9
+SubPath = "/store/data/non-bids/MSc_EventDuration/relevantEvents/%s_finalEvents.csv"
+
+# ╔═╡ 2e20e003-fb79-4579-b0ab-077940d7ff61
+begin
+	basisfunction = firbasis(τ=(-0.4,.8),sfreq=50,name="stimulus")
+	f  = @formula 0~1
+	bfDict = Dict(Any=>(f,basisfunction))
+end
+
+# ╔═╡ 2358465e-18b1-4770-8a98-8881c183cf31
+function RunUnfold(DataDF, AllEvents, bfDict, channels, basisfunction)
+	
+	# m = fit(UnfoldModel,bfDict,evts,data);
+	# results = coeftable(m)
+
+end
+
+# ╔═╡ 9367b8b3-b11d-47e2-8338-2b96fc2a0e94
+function RunUnfold(DataDF, AllEvents, formula, sfreq, channels, τ = [-0.3,1.])
+
+	
+	# we have multi channel support
+	# data_r = reshape(data,(1,:))
+	# cut the data into epochs
+	# data_epochs,times = Unfold.epoch(data=data_r,tbl=evts,τ=(-0.4,0.8),sfreq=50);
+
+	# m = fit(UnfoldModel,f,evts,data_epochs,times);
+	# results = coeftable(m)
+end
+
+# ╔═╡ c1167cea-3fdd-48c0-9986-590d9e922107
+typeof(",")
+
 # ╔═╡ dda49886-1af7-477b-b847-818ccf47ce7e
 layout = BidsLayout("/store/data/erp-core/", derivative=false, ses="P3")
+
+# ╔═╡ 06bba619-4e8f-4a63-8e67-f4e0c9216a87
+events = CollectEvents(layout[6:10,:].subject, SubPath, ",")
+
+# ╔═╡ 1e8133c3-e228-49f1-9770-9b58d94fe548
+typeof(layout[6:10,:].subject)
+
+# ╔═╡ 0b82bdaa-ec97-4031-8060-7fa68b024fdc
+layout
 
 # ╔═╡ d10bbcf4-a1ad-41cc-a3d0-f123ebc279dd
 dat = load_bids_eeg_data(layout[1:3,:])
 
 # ╔═╡ 84917f9f-43bd-4029-bc63-5e88be957f9d
-events = PyMNE.events_from_annotations(dat[1,2])
+evts = PyMNE.events_from_annotations(dat[1,2])
 
 # ╔═╡ 64171cdc-596f-417a-b148-80f8b368c2f1
 raw = dat[1,2]
@@ -162,6 +224,7 @@ raw.info["sfreq"]
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
+CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 MixedModels = "ff71e718-51f3-5ec2-a782-8ffcbfa3c316"
 Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
@@ -171,6 +234,7 @@ StatsModels = "3eaba693-59b7-5ba5-a881-562e759f1c8d"
 Unfold = "181c99d8-e21b-4ff3-b70b-c233eddec679"
 
 [compat]
+CSV = "~0.10.10"
 DataFrames = "~1.5.0"
 MixedModels = "~4.8.2"
 PyMNE = "~0.2.1"
@@ -184,7 +248,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.8.3"
 manifest_format = "2.0"
-project_hash = "ee2452d2233dbb0f80376f1792ba236365b95eb5"
+project_hash = "b3440e241838f19ce854fe5ce80bc9e17f818298"
 
 [[deps.AMD]]
 deps = ["Libdl", "LinearAlgebra", "SparseArrays", "Test"]
@@ -259,6 +323,12 @@ version = "1.0.8+0"
 git-tree-sha1 = "eb4cb44a499229b3b8426dcfb5dd85333951ff90"
 uuid = "fa961155-64e5-5f13-b03f-caf6b980ea82"
 version = "0.4.2"
+
+[[deps.CSV]]
+deps = ["CodecZlib", "Dates", "FilePathsBase", "InlineStrings", "Mmap", "Parsers", "PooledArrays", "PrecompileTools", "SentinelArrays", "Tables", "Unicode", "WeakRefStrings", "WorkerUtilities"]
+git-tree-sha1 = "ed28c86cbde3dc3f53cf76643c2e9bc11d56acc7"
+uuid = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
+version = "0.10.10"
 
 [[deps.Calculus]]
 deps = ["LinearAlgebra"]
@@ -456,6 +526,12 @@ version = "3.3.10+0"
 git-tree-sha1 = "acebe244d53ee1b461970f8910c235b259e772ef"
 uuid = "9aa1b823-49e4-5ca5-8b0f-3971ec8bab6a"
 version = "0.3.2"
+
+[[deps.FilePathsBase]]
+deps = ["Compat", "Dates", "Mmap", "Printf", "Test", "UUIDs"]
+git-tree-sha1 = "e27c4ebe80e8699540f2d6c805cc12203b614f12"
+uuid = "48062228-2e41-5def-b9a4-89aafe57970f"
+version = "0.9.20"
 
 [[deps.FileWatching]]
 uuid = "7b1f6079-737a-58dc-b8bc-7a2ca5c1b5ee"
@@ -1111,6 +1187,12 @@ git-tree-sha1 = "c81331b3b2e60a982be57c046ec91f599ede674a"
 uuid = "e17b2a0c-0bdf-430a-bd0c-3a23cae4ff39"
 version = "1.0.0"
 
+[[deps.WeakRefStrings]]
+deps = ["DataAPI", "InlineStrings", "Parsers"]
+git-tree-sha1 = "b1be2855ed9ed8eac54e5caff2afcdb442d52c23"
+uuid = "ea10d353-3f73-51f8-a26c-33c1cb351aa5"
+version = "1.4.2"
+
 [[deps.WorkerUtilities]]
 git-tree-sha1 = "cd1659ba0d57b71a464a29e64dbc67cfe83d54e7"
 uuid = "76eceee3-57b5-4d4a-8e66-0e911cebbf60"
@@ -1154,6 +1236,16 @@ version = "17.4.0+0"
 # ╠═0fd23ebc-f473-4fdf-a286-3b6dca35c597
 # ╠═7333622c-cbe4-4b5d-b198-3631eb833352
 # ╠═37534e6e-44e3-40fb-bb7a-5a9bf1d9407e
+# ╠═eaf920bd-68de-41f2-bca1-cbbb5d936942
+# ╠═6d340958-14dd-4aca-bd9b-765ef37faba6
+# ╠═a28d4044-f8eb-4155-8d61-f1adc91edea9
+# ╠═06bba619-4e8f-4a63-8e67-f4e0c9216a87
+# ╠═1e8133c3-e228-49f1-9770-9b58d94fe548
+# ╠═0b82bdaa-ec97-4031-8060-7fa68b024fdc
+# ╠═2e20e003-fb79-4579-b0ab-077940d7ff61
+# ╠═2358465e-18b1-4770-8a98-8881c183cf31
+# ╠═9367b8b3-b11d-47e2-8338-2b96fc2a0e94
+# ╠═c1167cea-3fdd-48c0-9986-590d9e922107
 # ╠═dda49886-1af7-477b-b847-818ccf47ce7e
 # ╠═d10bbcf4-a1ad-41cc-a3d0-f123ebc279dd
 # ╠═84917f9f-43bd-4029-bc63-5e88be957f9d

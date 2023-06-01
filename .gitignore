@@ -7,3 +7,5 @@
 /sampleData.tar.gz
 /Data/
 /tmp/
+.vscode
+.CondaPkg
