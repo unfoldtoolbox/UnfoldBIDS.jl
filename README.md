@@ -5,7 +5,7 @@ Sub/Wrapper-Package of Unfold.jl. Ultimately it should provide the means to auto
 ## Current Functionality
 
 ```julia
-using UnfoldBI
+using UnfoldBIDS
 
 
 # To look up the paths of all subjects and store in a Dataframe:
