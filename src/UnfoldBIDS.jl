@@ -16,9 +16,9 @@ include("utils.jl")
 
 # Export list
 export BidsLayout
-#export BIDSpath, loadRaw
-#export populateRaw
-#export addDefaultEventformulas!
+export load_bids_eeg_data
+export CollectEvents
+export RunUnfold
 #export epochedFit
 
 import StatsModels.FormulaTerm # for exporting
