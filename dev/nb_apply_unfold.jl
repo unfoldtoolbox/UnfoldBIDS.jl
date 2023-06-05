@@ -15,6 +15,9 @@ end
 using StatsModels, MixedModels, DataFrames, Statistics, Printf
 
 
+# ╔═╡ 4ad1ca6d-cb5e-495f-b7d5-d27cab1c6fcc
+using DataFramesMeta
+
 # ╔═╡ 7333622c-cbe4-4b5d-b198-3631eb833352
 function BidsLayout(BIDSPath::AbstractString;
     derivative::Bool=true,
@@ -71,7 +74,7 @@ function BidsLayout(BIDSPath::AbstractString;
     end
 
 
-    files_df = DataFrame(subject=[], file=[], path=[])  # Initialize an empty DataFrame to hold results
+    files_df = DataFrame(Subject=[], File=[], Path=[])  # Initialize an empty DataFrame to hold results
 
     # Search for files matching file pattern
     if specificFolder !== nothing
@@ -112,8 +115,8 @@ function load_bids_eeg_data(layout_df)
 	
 	    # Loop through each EEG data file
 	    for row in eachrow(layout_df)
-			file_path = joinpath(row.path,row.file)
-			@printf("Loading subject %s at:\n %s \n",row.subject, file_path)
+			file_path = joinpath(row.Path,row.File)
+			@printf("Loading subject %s at:\n %s \n",row.Subject, file_path)
 
 	        # Read in the EEG data as a dataframe using the appropriate reader
 	        if endswith(file_path, ".edf")
@@ -133,7 +136,7 @@ function load_bids_eeg_data(layout_df)
 	        #subject_id, task_id = match(r"sub-(.+)_task-(.*)_eeg", basename(file_path)).captures
 	        #eeg_data.subject_id .= subject_id
 	        #eeg_data.task_id .= task_id
-	        tmp_df = DataFrame(subject = row.subject, data = eeg_data)
+	        tmp_df = DataFrame(Subject = row.Subject, Data = eeg_data)
 
 			append!(eeg_df, tmp_df)
 	    end
@@ -143,7 +146,7 @@ function load_bids_eeg_data(layout_df)
 	end
 
 # ╔═╡ eaf920bd-68de-41f2-bca1-cbbb5d936942
-function CollectEvents(Subjects, CSVPath::String, delim::String)
+function CollectEvents(Subjects::Vector{Any}, CSVPath::String, delim::String)
 	AllEvents = DataFrame()
 	for sub in Subjects
 		events = CSV.read(Printf.format(Printf.Format(CSVPath),sub),DataFrame, delim=delim)
@@ -163,45 +166,84 @@ end
 # ╔═╡ a28d4044-f8eb-4155-8d61-f1adc91edea9
 SubPath = "/store/data/non-bids/MSc_EventDuration/relevantEvents/%s_finalEvents.csv"
 
-# ╔═╡ 2e20e003-fb79-4579-b0ab-077940d7ff61
-begin
-	basisfunction = firbasis(τ=(-0.4,.8),sfreq=50,name="stimulus")
-	f  = @formula 0~1
-	bfDict = Dict(Any=>(f,basisfunction))
-end
+# ╔═╡ 629b21aa-6429-4208-9c1f-9a2b13c10efa
+
 
 # ╔═╡ 2358465e-18b1-4770-8a98-8881c183cf31
-function RunUnfold(DataDF, AllEvents, bfDict, channels, basisfunction)
-	
-	# m = fit(UnfoldModel,bfDict,evts,data);
-	# results = coeftable(m)
+function RunUnfold(DataDF, EventsDF, bfDict; channels::Union{Nothing, String, Integer}=nothing, eventcolumn="event")
+	subjects = unique(DataDF.Subject)
 
+	ResultsDF = DataFrame()
+
+	for sub in subjects
+
+		# Get current subject
+		raw = @subset(DataDF, :Subject .== sub).Data
+		if channels == nothing
+			tmpData = pyconvert(Array,raw[1].get_data()).*10^6
+		else
+			tmpData = pyconvert(Array,raw[1].get_data(picks=channels)).*10^6
+		end
+		tmpEvents = @subset(EventsDF, :Subject .== sub)
+
+		# Fit Model
+		m = fit(UnfoldModel,bfDict,tmpEvents,tmpData, eventcolumn=eventcolumn);
+		results = coeftable(m)
+
+		results.Subject .= sub
+		append!(ResultsDF, results)
+
+
+	end
+	return ResultsDF
 end
 
 # ╔═╡ 9367b8b3-b11d-47e2-8338-2b96fc2a0e94
-function RunUnfold(DataDF, AllEvents, formula, sfreq, channels, τ = [-0.3,1.])
+function RunUnfold(DataDF, EventsDF, formula, sfreq, τ = (-0.3,1.); channels::Union{Nothing, String, Integer}=nothing)
 
 	
 	# we have multi channel support
 	# data_r = reshape(data,(1,:))
 	# cut the data into epochs
-	# data_epochs,times = Unfold.epoch(data=data_r,tbl=evts,τ=(-0.4,0.8),sfreq=50);
 
-	# m = fit(UnfoldModel,f,evts,data_epochs,times);
-	# results = coeftable(m)
+	subjects = unique(DataDF.Subject)
+
+	ResultsDF = DataFrame()
+
+	for sub in Subjects
+
+		# Get current subject
+		raw = @subset(DataDF, :Subject .== sub).Data
+		if channels == nothing
+			tmpData = pyconvert(Array,raw[1].get_data()).*10^6
+		else
+			tmpData = pyconvert(Array,raw[1].get_data(picks=channels)).*10^6
+		end
+
+		# Get events
+		tmpEvents = @subset(EventsDF, :Subject .== sub)
+
+		# Cut data into epochs
+		data_epochs,times = Unfold.epoch(data=tmpData,tbl=tmpEvents,τ=τ,sfreq=sfreq);
+		
+		# Fit Model
+		m = fit(UnfoldModel,formula,tmpEvents,data_epochs,times);
+		results = coeftable(m)
+
+		results.Subject .= sub
+		append!(ResultsDF, results)
+	end
+	return ResultsDF
 end
 
-# ╔═╡ c1167cea-3fdd-48c0-9986-590d9e922107
-typeof(",")
-
 # ╔═╡ dda49886-1af7-477b-b847-818ccf47ce7e
-layout = BidsLayout("/store/data/erp-core/", derivative=false, ses="P3")
+layout = BidsLayout("/store/data/MSc_EventDuration", derivative=true, specificFolder= "RS_replication/preprocessed")
 
 # ╔═╡ 06bba619-4e8f-4a63-8e67-f4e0c9216a87
-events = CollectEvents(layout[6:10,:].subject, SubPath, ",")
+events = CollectEvents(layout[1:3,:].Subject, SubPath, ",");
 
 # ╔═╡ 1e8133c3-e228-49f1-9770-9b58d94fe548
-typeof(layout[6:10,:].subject)
+layout[1:3,:].Subject
 
 # ╔═╡ 0b82bdaa-ec97-4031-8060-7fa68b024fdc
 layout
@@ -213,19 +255,34 @@ dat = load_bids_eeg_data(layout[1:3,:])
 evts = PyMNE.events_from_annotations(dat[1,2])
 
 # ╔═╡ 64171cdc-596f-417a-b148-80f8b368c2f1
-raw = dat[1,2]
+test =  @subset(dat, :Subject .== "001").Data
 
 # ╔═╡ ea4253bf-fdb1-434f-bd47-0928c892237d
-raw.info.keys()
+events
+
+# ╔═╡ 03af4025-4fc7-4008-af5c-3ece7e965ba8
+begin
+	#basisfunction = firbasis(τ=(-0.4,.8),sfreq=250,name="stimulus")
+	sfreq=250
+	f  = @formula 0~1
+	bfDict = Dict(
+				"stimulus"=>(
+					@formula(0~1),
+					firbasis(τ=(-1,1),sfreq=sfreq,name="stimulus")),
+				"response"=>(
+					@formula(0~1),
+					firbasis(τ=(-1,1),sfreq=sfreq,name="response")),)
+end
 
 # ╔═╡ 130a9ec4-737c-46f9-919b-0f851fda5ed0
-raw.info["sfreq"]
+resultsAll = RunUnfold(dat, events, bfDict, channels="Pz", eventcolumn="event_type")
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
 CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+DataFramesMeta = "1313f7d8-7da2-5740-9ea0-a2ca25f37964"
 MixedModels = "ff71e718-51f3-5ec2-a782-8ffcbfa3c316"
 Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
 PyMNE = "6c5003b2-cbe8-491c-a0d1-70088e6a0fd6"
@@ -236,6 +293,7 @@ Unfold = "181c99d8-e21b-4ff3-b70b-c233eddec679"
 [compat]
 CSV = "~0.10.10"
 DataFrames = "~1.5.0"
+DataFramesMeta = "~0.14.0"
 MixedModels = "~4.8.2"
 PyMNE = "~0.2.1"
 StatsModels = "~0.6.33"
@@ -248,7 +306,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.8.3"
 manifest_format = "2.0"
-project_hash = "b3440e241838f19ce854fe5ce80bc9e17f818298"
+project_hash = "6d6d3b04bbccb256c2c75efda20c2c0b2456e730"
 
 [[deps.AMD]]
 deps = ["Libdl", "LinearAlgebra", "SparseArrays", "Test"]
@@ -341,6 +399,11 @@ deps = ["DataAPI", "Future", "Missings", "Printf", "Requires", "Statistics", "Un
 git-tree-sha1 = "1568b28f91293458345dabba6a5ea3f183250a61"
 uuid = "324d7699-5711-5eae-9e2f-1d82baa6b597"
 version = "0.10.8"
+
+[[deps.Chain]]
+git-tree-sha1 = "8c4920235f6c561e401dfe569beb8b924adad003"
+uuid = "8be319e6-bccf-4806-a6f7-6fae938471bc"
+version = "0.5.0"
 
 [[deps.ChainRulesCore]]
 deps = ["Compat", "LinearAlgebra", "SparseArrays"]
@@ -438,6 +501,12 @@ deps = ["Compat", "DataAPI", "Future", "InlineStrings", "InvertedIndices", "Iter
 git-tree-sha1 = "aa51303df86f8626a962fccb878430cdb0a97eee"
 uuid = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 version = "1.5.0"
+
+[[deps.DataFramesMeta]]
+deps = ["Chain", "DataFrames", "MacroTools", "OrderedCollections", "Reexport"]
+git-tree-sha1 = "7f13b2f9fa5fc843a06596f1cc917ed1a3d6740b"
+uuid = "1313f7d8-7da2-5740-9ea0-a2ca25f37964"
+version = "0.14.0"
 
 [[deps.DataStructures]]
 deps = ["Compat", "InteractiveUtils", "OrderedCollections"]
@@ -1234,6 +1303,7 @@ version = "17.4.0+0"
 # ╔═╡ Cell order:
 # ╠═ade606f2-efdb-11ed-0fa7-318e9a8a5d83
 # ╠═0fd23ebc-f473-4fdf-a286-3b6dca35c597
+# ╠═4ad1ca6d-cb5e-495f-b7d5-d27cab1c6fcc
 # ╠═7333622c-cbe4-4b5d-b198-3631eb833352
 # ╠═37534e6e-44e3-40fb-bb7a-5a9bf1d9407e
 # ╠═eaf920bd-68de-41f2-bca1-cbbb5d936942
@@ -1242,15 +1312,15 @@ version = "17.4.0+0"
 # ╠═06bba619-4e8f-4a63-8e67-f4e0c9216a87
 # ╠═1e8133c3-e228-49f1-9770-9b58d94fe548
 # ╠═0b82bdaa-ec97-4031-8060-7fa68b024fdc
-# ╠═2e20e003-fb79-4579-b0ab-077940d7ff61
+# ╠═629b21aa-6429-4208-9c1f-9a2b13c10efa
 # ╠═2358465e-18b1-4770-8a98-8881c183cf31
 # ╠═9367b8b3-b11d-47e2-8338-2b96fc2a0e94
-# ╠═c1167cea-3fdd-48c0-9986-590d9e922107
 # ╠═dda49886-1af7-477b-b847-818ccf47ce7e
 # ╠═d10bbcf4-a1ad-41cc-a3d0-f123ebc279dd
 # ╠═84917f9f-43bd-4029-bc63-5e88be957f9d
 # ╠═64171cdc-596f-417a-b148-80f8b368c2f1
 # ╠═ea4253bf-fdb1-434f-bd47-0928c892237d
+# ╠═03af4025-4fc7-4008-af5c-3ece7e965ba8
 # ╠═130a9ec4-737c-46f9-919b-0f851fda5ed0
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
