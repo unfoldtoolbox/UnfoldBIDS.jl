@@ -2,7 +2,8 @@ function BidsLayout(BIDSPath::AbstractString;
     derivative::Bool=true,
     specificFolder::Union{Nothing,AbstractString}=nothing,
     excludeFolder::Union{Nothing,AbstractString}=nothing,
-    task::Union{Nothing,AbstractString}=nothing,
+    ses::Union{Nothing,AbstractString}=nothing,
+	task::Union{Nothing,AbstractString}=nothing,
     run::Union{Nothing,AbstractString}=nothing)
 
     # Any files with these endings will be returned
@@ -10,6 +11,13 @@ function BidsLayout(BIDSPath::AbstractString;
     nPattern = 2
 
     # Extend file pattern
+	if ses === nothing
+        @warn "No session provided, will load all sessions!!"
+    else
+        file_pattern = push!(file_pattern, "ses-" * ses)
+        nPattern += 1
+    end
+	
     if task === nothing
         @warn "No task provided, will load all tasks!!"
     else
@@ -45,7 +53,7 @@ function BidsLayout(BIDSPath::AbstractString;
     end
 
 
-    files_df = DataFrame(subject=[], file=[], path=[])  # Initialize an empty DataFrame to hold results
+    files_df = DataFrame(Subject=[], File=[], Path=[])  # Initialize an empty DataFrame to hold results
 
     # Search for files matching file pattern
     if specificFolder !== nothing
@@ -78,47 +86,44 @@ function BidsLayout(BIDSPath::AbstractString;
     return files_df
 end
 
-
 #-----------------------------------------------------------------------------------------------
 # Function loading BIDS data given BidsLayout DataFrame
 function load_bids_eeg_data(layout_df)
 
-	    # Initialize an empty dataframe
-	    eeg_df = DataFrame()
-	
-	    # Loop through each EEG data file
-	    for row in eachrow(layout_df)
-			file_path = joinpath(row.path,row.file)
-			@printf("Loading subject %s at:\n %s \n",row.subject, file_path)
+    # Initialize an empty dataframe
+    eeg_df = DataFrame()
 
-	        # Read in the EEG data as a dataframe using the appropriate reader
-	        if endswith(file_path, ".edf")
-	            eeg_data = PyMNE.io.read_raw_edf(file_path, verbose="ERROR")
-	        elseif endswith(file_path, ".vhdr")
-	            eeg_data = PyMNE.io.read_raw_brainvision(file_path, verbose="ERROR")
-	        elseif endswith(file_path, ".fif")
-	            eeg_data = PyMNE.io.read_raw_fif(file_path, verbose="ERROR")
-			elseif endswith(file_path, ".set")
-				eeg_data = PyMNE.io.read_raw_eeglab(file_path, verbose="ERROR")
-			end
-	
-			#############
-			# TODO: Append specific subject data to dataframe
-			#############
-			# Add the EEG data to the main dataframe, along with subject and task information
-	        #subject_id, task_id = match(r"sub-(.+)_task-(.*)_eeg", basename(file_path)).captures
-	        #eeg_data.subject_id .= subject_id
-	        #eeg_data.task_id .= task_id
-	        tmp_df = DataFrame(subject = row.subject, data = eeg_data)
+    # Loop through each EEG data file
+    for row in eachrow(layout_df)
+        file_path = joinpath(row.Path,row.File)
+        @printf("Loading subject %s at:\n %s \n",row.Subject, file_path)
 
-			append!(eeg_df, tmp_df)
-	    end
-	
-	    # Return the combined EEG data dataframe
-	    return eeg_df
-	end
-	
+        # Read in the EEG data as a dataframe using the appropriate reader
+        if endswith(file_path, ".edf")
+            eeg_data = PyMNE.io.read_raw_edf(file_path, verbose="ERROR")
+        elseif endswith(file_path, ".vhdr")
+            eeg_data = PyMNE.io.read_raw_brainvision(file_path, verbose="ERROR")
+        elseif endswith(file_path, ".fif")
+            eeg_data = PyMNE.io.read_raw_fif(file_path, verbose="ERROR")
+        elseif endswith(file_path, ".set")
+            eeg_data = PyMNE.io.read_raw_eeglab(file_path, verbose="ERROR")
+        end
 
+        #############
+        # TODO: Append specific subject data to dataframe
+        #############
+        # Add the EEG data to the main dataframe, along with subject and task information
+        #subject_id, task_id = match(r"sub-(.+)_task-(.*)_eeg", basename(file_path)).captures
+        #eeg_data.subject_id .= subject_id
+        #eeg_data.task_id .= task_id
+        tmp_df = DataFrame(Subject = row.Subject, Data = eeg_data)
+
+        append!(eeg_df, tmp_df)
+    end
+
+    # Return the combined EEG data dataframe
+    return eeg_df
+end
 #-----------------------------------------------------------------------------------------------
 
 # Function loading BIDS data directly by calling BidsLayout
@@ -173,3 +178,18 @@ function load_bids_eeg_data(BIDSPath::AbstractString;
 	    return eeg_df
 	end
 =#
+
+
+#-----------------------------------------------------------------------------------------------
+
+# Function to load events of all subjects from CSV file into DataFrame
+
+function CollectEvents(Subjects::Vector{Any}, CSVPath::String, delim::String)
+	AllEvents = DataFrame()
+	for sub in Subjects
+		events = CSV.read(Printf.format(Printf.Format(CSVPath),sub),DataFrame, delim=delim)
+		events.Subject .= sub
+		append!(AllEvents, events)
+	end
+	return AllEvents
+end

@@ -19,7 +19,7 @@ layout_df = BidsLayout(BIDSPath::AbstractString; # Path to BIDS root folder
 eeg_df = load_bids_eeg_data(layout_df::DataFrame)
 
 3×2 DataFrame
- Row │ subject    data                              
+ Row │ Subject    Data                              
      │ SubStrin…  Py                                
 ─────┼──────────────────────────────────────────────
    1 │ 005        <RawEEGLAB | sub-005_ses-001_tas…
@@ -27,10 +27,23 @@ eeg_df = load_bids_eeg_data(layout_df::DataFrame)
    3 │ 007        <RawEEGLAB | sub-007_ses-001_tas…
 
 
+# Currently loading events is only suppoted from CSV files:
+
+# First define the path where **all** CSV files are stored, e.g.:
+SubPath = "/store/data/path/to/events/%s_finalEvents.csv"
+
+# Then call
+events = CollectEvents(layout_df.Subject, SubPath, delimeter=",");
+
+# To run Unfold model:
+resultsALl = RunUnfold(DataDF, EventsDF, bfDict; channels::Union{Nothing, String, Integer}=nothing, eventcolumn="event")
+
 ```
 
 
 > **Note:** The ```specificFolder``` option will look for the folder either in the root (i.e. provided BIDSPath -> BIDSPath/specificFolder) or in the derivative (i.e. BIDSPath/derivatives -> BIDSPath/derivatives/specificFolder) based on the derivative flag!  
+
+
 
 ## UnfoldBIDS Quickstart
 
