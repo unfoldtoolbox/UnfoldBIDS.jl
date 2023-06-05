@@ -116,7 +116,7 @@ function load_bids_eeg_data(layout_df)
         #subject_id, task_id = match(r"sub-(.+)_task-(.*)_eeg", basename(file_path)).captures
         #eeg_data.subject_id .= subject_id
         #eeg_data.task_id .= task_id
-        tmp_df = DataFrame(subject = row.subject, Data = eeg_data)
+        tmp_df = DataFrame(subject = row.subject, data = eeg_data)
 
         append!(eeg_df, tmp_df)
     end
