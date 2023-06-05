@@ -1,10 +1,10 @@
 module UnfoldBIDS
 
 # basics
-using StatsModels, MixedModels, DataFrames, Statistics, Printf
+using StatsModels, MixedModels, DataFrames, DataFramesMeta, Statistics, Printf
 # file loading
 #using PyMNE, CSVFiles, DelimitedFiles, Glob
-using PyMNE
+using PyMNE, CSV
 # unfold
 using Unfold
 
