@@ -184,10 +184,14 @@ function load_bids_eeg_data(bidsPath::AbstractString;
 
 # Function to load events of all subjects from CSV file into DataFrame
 
-function collectEvents(subjects::Vector{Any}, CSVPath::String, delim::String)
+function collectEvents(subjects::Vector{Any}, CSVPath::String; delimiter=nothing)
 	AllEvents = DataFrame()
 	for sub in subjects
-		events = CSV.read(Printf.format(Printf.Format(CSVPath),sub),DataFrame, delim=delim)
+        pathFormated = Printf.Format(CSVPath)
+
+        @assert(length(unique(pathFormated.formats)) == 1)
+        
+		events = CSV.read(Printf.format(pathFormated,repeat([sub],length(pathFormated.formats))...),DataFrame, delim=delimiter)
 		events.subject .= sub
 		append!(AllEvents, events)
 	end
