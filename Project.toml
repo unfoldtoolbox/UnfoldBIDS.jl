@@ -24,6 +24,7 @@ Unfold = "181c99d8-e21b-4ff3-b70b-c233eddec679"
 
 [compat]
 ArtifactUtils = "0.2"
+CSV = "0.10"
 CSVFiles = "1"
 CairoMakie = "0.10"
 DataDeps = "0.7"
