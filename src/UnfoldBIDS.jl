@@ -15,10 +15,10 @@ include("load.jl")
 include("utils.jl")
 
 # Export list
-export BidsLayout
+export bidsLayout
 export load_bids_eeg_data
-export CollectEvents
-export RunUnfold
+export collectEvents
+export runUnfold
 #export epochedFit
 
 import StatsModels.FormulaTerm # for exporting

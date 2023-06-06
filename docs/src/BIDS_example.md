@@ -1,7 +1,7 @@
 # Working example of Unfold BIDS
 => Add an Artifact of one 8-bit subject (maybe downsamples, less channels to save space) using Artifacts.jl (dont ask Bene, but explain it to him how it works ;-)).
 
-TODO: Make one Subject into tar file (including BIDS structure)
+TODO: Make one subject into tar file (including BIDS structure)
     Usage: make tar.gz archive of data; upload to repo; make entry in Artifacts.toml with create_artifact, bind_artifact and artifact_hash
 
 ```julia

@@ -1,4 +1,4 @@
-function BidsLayout(BIDSPath::AbstractString;
+function bidsLayout(bidsPath::AbstractString;
     derivative::Bool=true,
     specificFolder::Union{Nothing,AbstractString}=nothing,
     excludeFolder::Union{Nothing,AbstractString}=nothing,
@@ -34,10 +34,10 @@ function BidsLayout(BIDSPath::AbstractString;
 
     # Choose a specific folder in either ./ or ./derivatives
     if derivative && specificFolder !== nothing
-        sPath = joinpath(BIDSPath, "derivatives", specificFolder)
+        sPath = joinpath(bidsPath, "derivatives", specificFolder)
         #@show sPath
     elseif specificFolder !== nothing
-        sPath = joinpath(BIDSPath, specificFolder)
+        sPath = joinpath(bidsPath, specificFolder)
         #@show sPath
     end
 
@@ -53,7 +53,7 @@ function BidsLayout(BIDSPath::AbstractString;
     end
 
 
-    files_df = DataFrame(Subject=[], File=[], Path=[])  # Initialize an empty DataFrame to hold results
+    files_df = DataFrame(subject=[], file=[], path=[])  # Initialize an empty DataFrame to hold results
 
     # Search for files matching file pattern
     if specificFolder !== nothing
@@ -70,7 +70,7 @@ function BidsLayout(BIDSPath::AbstractString;
 
     # When no specific folder is given look up whole Path    
     else
-        for (root, dirs, files) in walkdir(BIDSPath)
+        for (root, dirs, files) in walkdir(bidsPath)
             for file in files
                 if sum(occursin.(file_pattern, file)) >= nPattern &&
                    (derivative && (exclude == "" || !any(occursin.(exclude, root))) ||
@@ -87,7 +87,7 @@ function BidsLayout(BIDSPath::AbstractString;
 end
 
 #-----------------------------------------------------------------------------------------------
-# Function loading BIDS data given BidsLayout DataFrame
+# Function loading BIDS data given bidsLayout DataFrame
 function load_bids_eeg_data(layout_df)
 
     # Initialize an empty dataframe
@@ -95,8 +95,8 @@ function load_bids_eeg_data(layout_df)
 
     # Loop through each EEG data file
     for row in eachrow(layout_df)
-        file_path = joinpath(row.Path,row.File)
-        @printf("Loading subject %s at:\n %s \n",row.Subject, file_path)
+        file_path = joinpath(row.path,row.file)
+        @printf("Loading subject %s at:\n %s \n",row.subject, file_path)
 
         # Read in the EEG data as a dataframe using the appropriate reader
         if endswith(file_path, ".edf")
@@ -116,7 +116,7 @@ function load_bids_eeg_data(layout_df)
         #subject_id, task_id = match(r"sub-(.+)_task-(.*)_eeg", basename(file_path)).captures
         #eeg_data.subject_id .= subject_id
         #eeg_data.task_id .= task_id
-        tmp_df = DataFrame(Subject = row.Subject, Data = eeg_data)
+        tmp_df = DataFrame(subject = row.subject, data = eeg_data)
 
         append!(eeg_df, tmp_df)
     end
@@ -126,9 +126,9 @@ function load_bids_eeg_data(layout_df)
 end
 #-----------------------------------------------------------------------------------------------
 
-# Function loading BIDS data directly by calling BidsLayout
+# Function loading BIDS data directly by calling bidsLayout
 #=
-function load_bids_eeg_data(BIDSPath::AbstractString;
+function load_bids_eeg_data(bidsPath::AbstractString;
 							derivative::Bool=true,
 							specificFolder::Union{Nothing,AbstractString}=nothing,
 							excludeFolder::Union{Nothing,AbstractString}=nothing,
@@ -136,7 +136,7 @@ function load_bids_eeg_data(BIDSPath::AbstractString;
 							run::Union{Nothing,AbstractString}=nothing)
 
 	    # Find all EEG data files in the BIDS directory
-		layout_df = BidsLayout(BIDSPath=BIDSPath;
+		layout_df = bidsLayout(bidsPath=bidsPath;
 								derivative=derivative,
 								specificFolder=specificFolder,
 								excludeFolder=excludeFolder,
@@ -184,11 +184,15 @@ function load_bids_eeg_data(BIDSPath::AbstractString;
 
 # Function to load events of all subjects from CSV file into DataFrame
 
-function CollectEvents(Subjects::Vector{Any}, CSVPath::String, delim::String)
+function collectEvents(subjects::Vector{Any}, CSVPath::String; delimiter=nothing)
 	AllEvents = DataFrame()
-	for sub in Subjects
-		events = CSV.read(Printf.format(Printf.Format(CSVPath),sub),DataFrame, delim=delim)
-		events.Subject .= sub
+	for sub in subjects
+        pathFormated = Printf.Format(CSVPath)
+
+        @assert(length(unique(pathFormated.formats)) == 1)
+        
+		events = CSV.read(Printf.format(pathFormated,repeat([sub],length(pathFormated.formats))...),DataFrame, delim=delimiter)
+		events.subject .= sub
 		append!(AllEvents, events)
 	end
 	return AllEvents

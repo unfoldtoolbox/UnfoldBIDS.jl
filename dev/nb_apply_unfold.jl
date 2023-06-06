@@ -19,7 +19,7 @@ using StatsModels, MixedModels, DataFrames, Statistics, Printf
 using DataFramesMeta
 
 # ╔═╡ 7333622c-cbe4-4b5d-b198-3631eb833352
-function BidsLayout(BIDSPath::AbstractString;
+function bidsLayout(bidsPath::AbstractString;
     derivative::Bool=true,
     specificFolder::Union{Nothing,AbstractString}=nothing,
     excludeFolder::Union{Nothing,AbstractString}=nothing,
@@ -55,10 +55,10 @@ function BidsLayout(BIDSPath::AbstractString;
 
     # Choose a specific folder in either ./ or ./derivatives
     if derivative && specificFolder !== nothing
-        sPath = joinpath(BIDSPath, "derivatives", specificFolder)
+        sPath = joinpath(bidsPath, "derivatives", specificFolder)
         #@show sPath
     elseif specificFolder !== nothing
-        sPath = joinpath(BIDSPath, specificFolder)
+        sPath = joinpath(bidsPath, specificFolder)
         #@show sPath
     end
 
@@ -74,7 +74,7 @@ function BidsLayout(BIDSPath::AbstractString;
     end
 
 
-    files_df = DataFrame(Subject=[], File=[], Path=[])  # Initialize an empty DataFrame to hold results
+    files_df = DataFrame(subject=[], file=[], Path=[])  # Initialize an empty DataFrame to hold results
 
     # Search for files matching file pattern
     if specificFolder !== nothing
@@ -91,7 +91,7 @@ function BidsLayout(BIDSPath::AbstractString;
 
     # When no specific folder is given look up whole Path    
     else
-        for (root, dirs, files) in walkdir(BIDSPath)
+        for (root, dirs, files) in walkdir(bidsPath)
             for file in files
                 if sum(occursin.(file_pattern, file)) >= nPattern &&
                    (derivative && (exclude == "" || !any(occursin.(exclude, root))) ||
@@ -115,8 +115,8 @@ function load_bids_eeg_data(layout_df)
 	
 	    # Loop through each EEG data file
 	    for row in eachrow(layout_df)
-			file_path = joinpath(row.Path,row.File)
-			@printf("Loading subject %s at:\n %s \n",row.Subject, file_path)
+			file_path = joinpath(row.path,row.file)
+			@printf("Loading subject %s at:\n %s \n",row.subject, file_path)
 
 	        # Read in the EEG data as a dataframe using the appropriate reader
 	        if endswith(file_path, ".edf")
@@ -136,7 +136,7 @@ function load_bids_eeg_data(layout_df)
 	        #subject_id, task_id = match(r"sub-(.+)_task-(.*)_eeg", basename(file_path)).captures
 	        #eeg_data.subject_id .= subject_id
 	        #eeg_data.task_id .= task_id
-	        tmp_df = DataFrame(Subject = row.Subject, Data = eeg_data)
+	        tmp_df = DataFrame(subject = row.subject, Data = eeg_data)
 
 			append!(eeg_df, tmp_df)
 	    end
@@ -146,11 +146,11 @@ function load_bids_eeg_data(layout_df)
 	end
 
 # ╔═╡ eaf920bd-68de-41f2-bca1-cbbb5d936942
-function CollectEvents(Subjects::Vector{Any}, CSVPath::String, delim::String)
+function collectEvents(subjects::Vector{Any}, CSVPath::String, delim::String)
 	AllEvents = DataFrame()
-	for sub in Subjects
+	for sub in subjects
 		events = CSV.read(Printf.format(Printf.Format(CSVPath),sub),DataFrame, delim=delim)
-		events.Subject .= sub
+		events.subject .= sub
 		append!(AllEvents, events)
 	end
 	return AllEvents
@@ -170,27 +170,27 @@ SubPath = "/store/data/non-bids/MSc_EventDuration/relevantEvents/%s_finalEvents.
 
 
 # ╔═╡ 2358465e-18b1-4770-8a98-8881c183cf31
-function RunUnfold(DataDF, EventsDF, bfDict; channels::Union{Nothing, String, Integer}=nothing, eventcolumn="event")
-	subjects = unique(DataDF.Subject)
+function runUnfold(DataDF, EventsDF, bfDict; channels::Union{Nothing, String, Integer}=nothing, eventcolumn="event")
+	subjects = unique(DataDF.subject)
 
 	ResultsDF = DataFrame()
 
 	for sub in subjects
 
 		# Get current subject
-		raw = @subset(DataDF, :Subject .== sub).Data
+		raw = @subset(DataDF, :subject .== sub)data
 		if channels == nothing
 			tmpData = pyconvert(Array,raw[1].get_data()).*10^6
 		else
 			tmpData = pyconvert(Array,raw[1].get_data(picks=channels)).*10^6
 		end
-		tmpEvents = @subset(EventsDF, :Subject .== sub)
+		tmpEvents = @subset(EventsDF, :subject .== sub)
 
 		# Fit Model
 		m = fit(UnfoldModel,bfDict,tmpEvents,tmpData, eventcolumn=eventcolumn);
 		results = coeftable(m)
 
-		results.Subject .= sub
+		results.subject .= sub
 		append!(ResultsDF, results)
 
 
@@ -199,21 +199,21 @@ function RunUnfold(DataDF, EventsDF, bfDict; channels::Union{Nothing, String, In
 end
 
 # ╔═╡ 9367b8b3-b11d-47e2-8338-2b96fc2a0e94
-function RunUnfold(DataDF, EventsDF, formula, sfreq, τ = (-0.3,1.); channels::Union{Nothing, String, Integer}=nothing)
+function runUnfold(DataDF, EventsDF, formula, sfreq, τ = (-0.3,1.); channels::Union{Nothing, String, Integer}=nothing)
 
 	
 	# we have multi channel support
 	# data_r = reshape(data,(1,:))
 	# cut the data into epochs
 
-	subjects = unique(DataDF.Subject)
+	subjects = unique(DataDF.subject)
 
 	ResultsDF = DataFrame()
 
-	for sub in Subjects
+	for sub in subjects
 
 		# Get current subject
-		raw = @subset(DataDF, :Subject .== sub).Data
+		raw = @subset(DataDF, :subject .== sub)data
 		if channels == nothing
 			tmpData = pyconvert(Array,raw[1].get_data()).*10^6
 		else
@@ -221,7 +221,7 @@ function RunUnfold(DataDF, EventsDF, formula, sfreq, τ = (-0.3,1.); channels::U
 		end
 
 		# Get events
-		tmpEvents = @subset(EventsDF, :Subject .== sub)
+		tmpEvents = @subset(EventsDF, :subject .== sub)
 
 		# Cut data into epochs
 		data_epochs,times = Unfold.epoch(data=tmpData,tbl=tmpEvents,τ=τ,sfreq=sfreq);
@@ -230,20 +230,20 @@ function RunUnfold(DataDF, EventsDF, formula, sfreq, τ = (-0.3,1.); channels::U
 		m = fit(UnfoldModel,formula,tmpEvents,data_epochs,times);
 		results = coeftable(m)
 
-		results.Subject .= sub
+		results.subject .= sub
 		append!(ResultsDF, results)
 	end
 	return ResultsDF
 end
 
 # ╔═╡ dda49886-1af7-477b-b847-818ccf47ce7e
-layout = BidsLayout("/store/data/MSc_EventDuration", derivative=true, specificFolder= "RS_replication/preprocessed")
+layout = bidsLayout("/store/data/MSc_EventDuration", derivative=true, specificFolder= "RS_replication/preprocessed")
 
 # ╔═╡ 06bba619-4e8f-4a63-8e67-f4e0c9216a87
-events = CollectEvents(layout[1:3,:].Subject, SubPath, ",");
+events = collectEvents(layout[1:3,:].subject, SubPath, ",");
 
 # ╔═╡ 1e8133c3-e228-49f1-9770-9b58d94fe548
-layout[1:3,:].Subject
+layout[1:3,:].subject
 
 # ╔═╡ 0b82bdaa-ec97-4031-8060-7fa68b024fdc
 layout
@@ -255,7 +255,7 @@ dat = load_bids_eeg_data(layout[1:3,:])
 evts = PyMNE.events_from_annotations(dat[1,2])
 
 # ╔═╡ 64171cdc-596f-417a-b148-80f8b368c2f1
-test =  @subset(dat, :Subject .== "001").Data
+test =  @subset(dat, :subject .== "001")data
 
 # ╔═╡ ea4253bf-fdb1-434f-bd47-0928c892237d
 events
@@ -275,7 +275,7 @@ begin
 end
 
 # ╔═╡ 130a9ec4-737c-46f9-919b-0f851fda5ed0
-resultsAll = RunUnfold(dat, events, bfDict, channels="Pz", eventcolumn="event_type")
+resultsAll = runUnfold(dat, events, bfDict, channels="Pz", eventcolumn="event_type")
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """

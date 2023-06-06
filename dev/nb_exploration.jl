@@ -16,7 +16,7 @@ end
 bids_dir = "/store/data/MSc_EventDuration"
 
 # ╔═╡ b69c0452-1330-46cf-aa2e-f01754151955
-function BidsLayout(BIDSPath::AbstractString; 
+function bidsLayout(bidsPath::AbstractString; 
 						derivative::Bool=true, 
 						dFolder::String="",
 						exFolder::String="raw", 
@@ -46,7 +46,7 @@ function BidsLayout(BIDSPath::AbstractString;
 	
 	files_df = DataFrame(subject = [], file=[], path=[])  # Initialize an empty DataFrame to hold results
 
-    for (root, dirs, files) in walkdir(BIDSPath)
+    for (root, dirs, files) in walkdir(bidsPath)
         for file in files
             if sum(occursin.(file_pattern, file)) >= 2 &&
                 ((derivative && occursin(derivativeFolder, root)) ||
@@ -62,7 +62,7 @@ function BidsLayout(BIDSPath::AbstractString;
 end
 
 # ╔═╡ 65a11193-ab24-418c-b581-b6531e846e67
-size(BidsLayout(bids_dir, dFolder="RS_replication/preprocessed/", task="Oddball"))
+size(bidsLayout(bids_dir, dFolder="RS_replication/preprocessed/", task="Oddball"))
 
 # ╔═╡ 54dd6513-36f0-4641-b2ec-287cb1430f42
 begin
@@ -71,7 +71,7 @@ begin
 end
 
 # ╔═╡ 459804c2-ac68-4361-b69d-d38984c3728f
-sub_df = BidsLayout(bids_dir, dFolder="RS_replication/preprocessed/", task="Oddball")
+sub_df = bidsLayout(bids_dir, dFolder="RS_replication/preprocessed/", task="Oddball")
 
 # ╔═╡ 2129d1f3-ea10-41ef-afe9-2855e50eee28
 begin
