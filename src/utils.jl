@@ -2,8 +2,11 @@
 
 #function rununfold(eeg_df,formula=xy,channels=xy,[basisfunction=FIR | taus = [-0.3,1.] ,...)
 
+"""
 
-function runUnfold(dataDF, eventsDF, bfDict; channels::Union{Nothing, String, Integer}=nothing, eventcolumn="event")
+- removeTimeexpandedXs (true): Removes the timeexpanded designmatrix which significantly reduces the memory-consumption. This Xs is rarely needed, but can be recovered (look into the Unfold.load function)
+"""
+function runUnfold(dataDF, eventsDF, bfDict; channels::AbstractVector{<:Union{String, Integer}}=[], eventcolumn="event",removeTimeexpandedXs=true)
 	subjects = unique(dataDF.subject)
 
 	resultsDF = DataFrame()
@@ -12,18 +15,19 @@ function runUnfold(dataDF, eventsDF, bfDict; channels::Union{Nothing, String, In
 
 		# Get current subject
 		raw = @subset(dataDF, :subject .== sub).data
-		if channels == nothing
-			tmpData = pyconvert(Array,raw[1].get_data(units="uV"))
-		else
-			tmpData = pyconvert(Array,raw[1].get_data(picks=channels,units="uV"))
-		end
+		
+		tmpData = pyconvert(Array,raw[1].get_data(picks=pylist(channels),units="uV"))
+		
 		tmpEvents = @subset(eventsDF, :subject .== sub)
 
 		# Fit Model
-		m = fit(UnfoldModel,bfDict,tmpEvents,tmpData, eventcolumn=eventcolumn);
-		results = coeftable(m)
+		m = fit(UnfoldModel,bfDict,tmpEvents,tmpData; eventcolumn=eventcolumn);
 
-		results.subject .= sub
+		if removeTimeexpandedXs && (m isa UnfoldLinearModelContinuousTime || m isa UnfoldLinearModelContinuousTime)
+			m = typeof(m)(m.design, Unfold.DesignMatrix(designmatrix(m).formulas, missing, designmatrix(m).events), m.modelfit)
+		end
+		results = DataFrame(:subject => sub, :model => m)
+		
 		append!(resultsDF, results)
 
 
