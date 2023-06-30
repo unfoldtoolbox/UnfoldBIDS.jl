@@ -88,15 +88,20 @@ end
 
 #-----------------------------------------------------------------------------------------------
 # Function loading BIDS data given bidsLayout DataFrame
-function load_bids_eeg_data(layout_df)
+function load_bids_eeg_data(layout_df; verbose::Bool=true)
 
     # Initialize an empty dataframe
     eeg_df = DataFrame()
 
+    pbar = ProgressBar(total=size(layout_df,1))
+
     # Loop through each EEG data file
     for row in eachrow(layout_df)
         file_path = joinpath(row.path,row.file)
-        @printf("Loading subject %s at:\n %s \n",row.subject, file_path)
+        if verbose
+            update(pbar)
+            #@printf("Loading subject %s at:\n %s \n",row.subject, file_path)
+        end
 
         # Read in the EEG data as a dataframe using the appropriate reader
         if endswith(file_path, ".edf")
