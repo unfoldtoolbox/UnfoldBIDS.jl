@@ -7,8 +7,9 @@ Sub/Wrapper-Package of Unfold.jl. Ultimately it should provide the means to auto
 ```julia
 using UnfoldBIDS
 
+
 # To look up the paths of all subjects and store in a Dataframe:
-layout_df = BidsLayout(BIDSPath::AbstractString; # Path to BIDS root folder
+layout_df = bidsLayout(bidsPath::AbstractString; # Path to BIDS root folder
                      derivative::Bool=true, # Do you want to us the derivative/ processed data? Default = true
                      specificFolder::Union{Nothing,AbstractString}=nothing, # If you want a specific folder in derivatives or root specify here
                      excludeFolder::Union{Nothing,AbstractString}=nothing, # You can exclude specific folders when not looking for a specific sub-folder 
@@ -19,7 +20,7 @@ layout_df = BidsLayout(BIDSPath::AbstractString; # Path to BIDS root folder
 eeg_df = load_bids_eeg_data(layout_df::DataFrame)
 
 3×2 DataFrame
- Row │ Subject    Data                              
+ Row │ subject    data                              
      │ SubStrin…  Py                                
 ─────┼──────────────────────────────────────────────
    1 │ 005        <RawEEGLAB | sub-005_ses-001_tas…
@@ -30,18 +31,18 @@ eeg_df = load_bids_eeg_data(layout_df::DataFrame)
 # Currently loading events is only suppoted from CSV files:
 
 # First define the path where **all** CSV files are stored, e.g.:
-SubPath = "/store/data/path/to/events/%s_finalEvents.csv"
+subPath = "/store/data/path/to/events/%s_finalEvents.csv"
 
 # Then call
-events = CollectEvents(layout_df.Subject, SubPath, delimeter=",");
+events = collectEvents(layout_df.subject, subPath, delimeter=",");
 
 # To run Unfold model:
-resultsALl = RunUnfold(DataDF, EventsDF, bfDict; channels::Union{Nothing, String, Integer}=nothing, eventcolumn="event")
+resultsALl = runUnfold(dataDF, eventsDF, bfDict; channels::Union{Nothing, String, Integer}=nothing, eventcolumn="event")
 
 ```
 
 
-> **Note:** The ```specificFolder``` option will look for the folder either in the root (i.e. provided BIDSPath -> BIDSPath/specificFolder) or in the derivative (i.e. BIDSPath/derivatives -> BIDSPath/derivatives/specificFolder) based on the derivative flag!  
+> **Note:** The ```specificFolder``` option will look for the folder either in the root (i.e. provided bidsPath -> bidsPath/specificFolder) or in the derivative (i.e. bidsPath/derivatives -> bidsPath/derivatives/specificFolder) based on the derivative flag!  
 
 
 
