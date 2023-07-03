@@ -75,9 +75,9 @@ function bidsLayout(bidsPath::AbstractString;
                 if sum(occursin.(file_pattern, file)) >= nPattern &&
                    (derivative && (exclude == "" || !any(occursin.(exclude, root))) ||
                     (!derivative && !any(occursin.(exclude, root))))
-
-                    sub_string = match(r"sub-\d{3}", file)
-                    sub = last(sub_string.match, 3)
+                    sub_string = match(r"^sub-\d{1,}", file)
+                    sub = split(sub_string.match,"sub-")[2] # always #2 because the regexp has a lookup from front ^
+                    
                     push!(files_df, (sub, file, root))
                 end
             end
