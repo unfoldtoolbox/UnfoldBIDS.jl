@@ -35,10 +35,14 @@ function runUnfold(dataDF, eventsDF, bfDict; channels::AbstractVector{<:Union{St
 	return resultsDF
 end
 
-function calculateGA(resultsDF)
+function calculateGA(resultsDF; channels=:false)
 	GA = @chain resultsDF begin
+		# TODO: check if this works
+		if channels
+			@subset(:channel .== channels)
+		end
 		# need to check which variables to use
-		@by(:subject, :basisfunction, :estimate = mean(estimate))
+		@by([:basisname,:coefname,:time, :channel], :estimate = mean(estimate))
 	end
 end
 #=
