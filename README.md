@@ -42,8 +42,10 @@ AppStore -> JuliaUp,  or `winget install julia -s msstore` in CMD
 
 ```julia
 using Pkg
-Pkg.add("UnfoldBIDS")
+Pkg.add("https://github.com/unfoldtoolbox/UnfoldBIDS.jl")
 ```
+
+> **Note:** The package is currently not registered. Once it is registered the above add command will change to ```Pkg.add("UnfoldBIDS")```
 
 ## Current Functionality
 
