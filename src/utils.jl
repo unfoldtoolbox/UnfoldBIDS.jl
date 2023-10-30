@@ -35,6 +35,16 @@ function runUnfold(dataDF, eventsDF, bfDict; channels::AbstractVector{<:Union{St
 	return resultsDF
 end
 
+function calculateGA(resultsDF; channels=:false)
+	GA = @chain resultsDF begin
+		# TODO: check if this works
+		if channels
+			@subset(:channel .== channels)
+		end
+		# need to check which variables to use
+		@by([:basisname,:coefname,:time, :channel], :estimate = mean(estimate))
+	end
+end
 #=
 # Function to run unfold on epoched data
 function runUnfold(DataDF, EventsDF, formula, sfreq, τ = (-0.3,1.); channels::Union{Nothing, String, Integer}=nothing)

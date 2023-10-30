@@ -83,6 +83,14 @@ function bidsLayout(bidsPath::AbstractString;
             end
         end
     end
+
+    # add events File names
+    try
+        addEventFiles!(files_df) 
+    catch
+        @warn "Something went wrong with tsv file detection. Needs manual intervention."
+    end
+
     return files_df
 end
 
@@ -201,4 +209,40 @@ function collectEvents(subjects::Vector{Any}, CSVPath::String; delimiter=nothing
 		append!(AllEvents, events)
 	end
 	return AllEvents
+end
+
+#-----------------------------------------------------------------------------------------------
+
+# Function to find and load all events files into LayoutDataFrame
+
+function addEventFiles!(layoutDF)
+    
+    allFiles = []
+    # Do some stuff @byrow, i.e. find the tsv files
+for s in eachrow(layoutDF)
+    eegFile = s.file
+    subStr = findlast("eeg", eegFile)[1]
+    tmpFile = eegFile[begin:subStr-1] * "events.tsv"
+
+    # Check if file exists
+    files = readdir(s.path) # Gives all files as Vector of strings
+
+    tmpIdx = occursin.(tmpFile, files)
+
+    if sum(tmpIdx) == 0
+        @show tmpFile
+        @error "No events tsv file found! Please make sure to provide tsv files for all subjects"
+    elseif sum(tmpIdx) > 1
+        @error "Multiple matching .tsv files found" # Add which file was looking for
+    end
+
+    evtsFile = files[tmpIdx][1]
+
+    push!(allFiles, evtsFile)
+
+end
+
+    layoutDF.events = allFiles
+
+return layoutDF
 end
