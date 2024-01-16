@@ -38,8 +38,22 @@ function runUnfold(dataDF, eventsDF, bfDict; eventcolumn="event",removeTimeexpan
 	return resultsDF
 end
 
+# Function to run Preprocessing functions on data
 function rawToData(raw,tmpEvents;channels::AbstractVector{<:Union{String, Integer}}=[])
 	return pyconvert(Array,raw.get_data(picks=pylist(channels),units="uV"))
+
+# Calculate Grand average; this is likely a TODO
+function calculateGA(resultsDF; channels=:false)
+	GA = @chain resultsDF begin
+		# TODO: check if this works
+		if channels
+			@subset(:channel .== channels)
+		end
+		# need to check which variables to use
+		@by([:basisname,:coefname,:time, :channel], :estimate = mean(estimate))
+	end
+
+    
 end
 #=
 # Function to run unfold on epoched data
