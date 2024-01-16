@@ -41,6 +41,7 @@ end
 # Function to run Preprocessing functions on data
 function rawToData(raw,tmpEvents;channels::AbstractVector{<:Union{String, Integer}}=[])
 	return pyconvert(Array,raw.get_data(picks=pylist(channels),units="uV"))
+end
 
 # Calculate Grand average; this is likely a TODO
 function calculateGA(resultsDF; channels=:false)
