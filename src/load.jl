@@ -3,7 +3,7 @@ function bidsLayout(bidsPath::AbstractString;
     specificFolder::Union{Nothing,AbstractString}=nothing,
     excludeFolder::Union{Nothing,AbstractString}=nothing,
     ses::Union{Nothing,AbstractString}=nothing,
-	task::Union{Nothing,AbstractString}=nothing,
+    task::Union{Nothing,AbstractString}=nothing,
     run::Union{Nothing,AbstractString}=nothing)
 
     # Any files with these endings will be returned
@@ -11,13 +11,13 @@ function bidsLayout(bidsPath::AbstractString;
     nPattern = 2
 
     # Extend file pattern
-	if ses === nothing
+    if ses === nothing
         @warn "No session provided, will load all sessions!!"
     else
         file_pattern = push!(file_pattern, "ses-" * ses)
         nPattern += 1
     end
-	
+
     if task === nothing
         @warn "No task provided, will load all tasks!!"
     else
@@ -68,7 +68,7 @@ function bidsLayout(bidsPath::AbstractString;
             end
         end
 
-    # When no specific folder is given look up whole Path    
+        # When no specific folder is given look up whole Path    
     else
         for (root, dirs, files) in walkdir(bidsPath)
             for file in files
@@ -76,8 +76,8 @@ function bidsLayout(bidsPath::AbstractString;
                    (derivative && (exclude == "" || !any(occursin.(exclude, root))) ||
                     (!derivative && !any(occursin.(exclude, root))))
                     sub_string = match(r"^sub-\d{1,}", file)
-                    sub = split(sub_string.match,"sub-")[2] # always #2 because the regexp has a lookup from front ^
-                    
+                    sub = split(sub_string.match, "sub-")[2] # always #2 because the regexp has a lookup from front ^
+
                     push!(files_df, (sub, file, root))
                 end
             end
@@ -85,8 +85,9 @@ function bidsLayout(bidsPath::AbstractString;
     end
 
     # add events File names
+    # TODO: Check if adding events paths to the dataframe actually works; R.S. 01/24
     try
-        addEventFiles!(files_df) 
+        addEventFiles!(files_df)
     catch
         @warn "Something went wrong with tsv file detection. Needs manual intervention."
     end
@@ -101,11 +102,11 @@ function load_bids_eeg_data(layout_df; verbose::Bool=true)
     # Initialize an empty dataframe
     eeg_df = DataFrame()
 
-    pbar = ProgressBar(total=size(layout_df,1))
+    pbar = ProgressBar(total=size(layout_df, 1))
 
     # Loop through each EEG data file
     for row in eachrow(layout_df)
-        file_path = joinpath(row.path,row.file)
+        file_path = joinpath(row.path, row.file)
         if verbose
             update(pbar)
             #@printf("Loading subject %s at:\n %s \n",row.subject, file_path)
@@ -129,7 +130,9 @@ function load_bids_eeg_data(layout_df; verbose::Bool=true)
         #subject_id, task_id = match(r"sub-(.+)_task-(.*)_eeg", basename(file_path)).captures
         #eeg_data.subject_id .= subject_id
         #eeg_data.task_id .= task_id
-        tmp_df = DataFrame(subject = row.subject, data = eeg_data)
+        tmp_df = DataFrame(subject=row.subject, data=eeg_data)
+
+        # TODO: Add events DataFrames as additional collumn per subject
 
         append!(eeg_df, tmp_df)
     end
@@ -155,10 +158,10 @@ function load_bids_eeg_data(bidsPath::AbstractString;
 								excludeFolder=excludeFolder,
 								task=task,
 								run=run)
-		
+
 	    # Initialize an empty dataframe
 	    eeg_df = DataFrame()
-	
+
 	    # Loop through each EEG data file
 	    for row in eachrow(layout_df)
 			file_path = joinpath(row.path,row.file)
@@ -174,7 +177,7 @@ function load_bids_eeg_data(bidsPath::AbstractString;
 			elseif endswith(file_path, ".set")
 				eeg_data = PyMNE.io.read_raw_eeglab(file_path, verbose="ERROR")
 			end
-	
+
 			#############
 			# TODO: Append specific subject data to dataframe
 			#############
@@ -186,7 +189,7 @@ function load_bids_eeg_data(bidsPath::AbstractString;
 
 			append!(eeg_df, tmp_df)
 	    end
-	
+
 	    # Return the combined EEG data dataframe
 	    return eeg_df
 	end
@@ -196,19 +199,20 @@ function load_bids_eeg_data(bidsPath::AbstractString;
 #-----------------------------------------------------------------------------------------------
 
 # Function to load events of all subjects from CSV file into DataFrame
+# NOTE: This is old and should be renamed; kept for now
 
 function collectEvents(subjects::Vector{Any}, CSVPath::String; delimiter=nothing)
-	AllEvents = DataFrame()
-	for sub in subjects
+    AllEvents = DataFrame()
+    for sub in subjects
         pathFormated = Printf.Format(CSVPath)
 
         @assert(length(unique(pathFormated.formats)) == 1)
-        
-		events = CSV.read(Printf.format(pathFormated,repeat([sub],length(pathFormated.formats))...),DataFrame, delim=delimiter)
-		events.subject .= sub
-		append!(AllEvents, events)
-	end
-	return AllEvents
+
+        events = CSV.read(Printf.format(pathFormated, repeat([sub], length(pathFormated.formats))...), DataFrame, delim=delimiter)
+        events.subject .= sub
+        append!(AllEvents, events)
+    end
+    return AllEvents
 end
 
 #-----------------------------------------------------------------------------------------------
@@ -216,33 +220,33 @@ end
 # Function to find and load all events files into LayoutDataFrame
 
 function addEventFiles!(layoutDF)
-    
+
     allFiles = []
     # Do some stuff @byrow, i.e. find the tsv files
-for s in eachrow(layoutDF)
-    eegFile = s.file
-    subStr = findlast("eeg", eegFile)[1]
-    tmpFile = eegFile[begin:subStr-1] * "events.tsv"
+    for s in eachrow(layoutDF)
+        eegFile = s.file
+        subStr = findlast("eeg", eegFile)[1]
+        tmpFile = eegFile[begin:subStr-1] * "events.tsv"
 
-    # Check if file exists
-    files = readdir(s.path) # Gives all files as Vector of strings
+        # Check if file exists
+        files = readdir(s.path) # Gives all files as Vector of strings
 
-    tmpIdx = occursin.(tmpFile, files)
+        tmpIdx = occursin.(tmpFile, files)
 
-    if sum(tmpIdx) == 0
-        @show tmpFile
-        @error "No events tsv file found! Please make sure to provide tsv files for all subjects"
-    elseif sum(tmpIdx) > 1
-        @error "Multiple matching .tsv files found" # Add which file was looking for
+        if sum(tmpIdx) == 0
+            @show tmpFile
+            @error "No events tsv file found! Please make sure to provide tsv files for all subjects"
+        elseif sum(tmpIdx) > 1
+            @error "Multiple matching .tsv files found" # Add which file was looking for
+        end
+
+        evtsFile = files[tmpIdx][1]
+
+        push!(allFiles, evtsFile)
+
     end
-
-    evtsFile = files[tmpIdx][1]
-
-    push!(allFiles, evtsFile)
-
-end
 
     layoutDF.events = allFiles
 
-return layoutDF
+    return layoutDF
 end
