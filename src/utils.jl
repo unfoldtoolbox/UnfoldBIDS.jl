@@ -44,6 +44,8 @@ function rawToData(raw,tmpEvents;channels::AbstractVector{<:Union{String, Intege
 end
 
 # Calculate Grand average; this is likely a TODO
+# Commented this out for now as this might go into UnfoldStats; R.S. 18/01/24
+#=
 function calculateGA(resultsDF; channels=:false)
 	GA = @chain resultsDF begin
 		# TODO: check if this works
@@ -56,6 +58,8 @@ function calculateGA(resultsDF; channels=:false)
 
     
 end
+=#
+
 #=
 # Function to run unfold on epoched data
 function runUnfold(DataDF, EventsDF, formula, sfreq, τ = (-0.3,1.); channels::Union{Nothing, String, Integer}=nothing)
