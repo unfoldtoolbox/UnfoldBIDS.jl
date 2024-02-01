@@ -73,14 +73,6 @@ eeg_df = load_bids_eeg_data(layout_df::DataFrame)
    3 │ 007        <RawEEGLAB | sub-007_ses-001_tas…
 
 
-# Currently loading events is only suppoted from CSV files:
-
-# First define the path where **all** CSV files are stored, e.g.:
-subPath = "/store/data/path/to/events/%s_finalEvents.csv"
-
-# Then call
-events = collectEvents(layout_df.subject, subPath, delimeter=",");
-
 # To run Unfold model:
 resultsAll = runUnfold(dataDF, eventsDF, bfDict; channels::Union{Nothing, String, Integer}=nothing, eventcolumn="event")
 
@@ -88,6 +80,12 @@ resultsAll = runUnfold(dataDF, eventsDF, bfDict; channels::Union{Nothing, String
 
 
 > **Note:** The ```specificFolder``` option will look for the folder either in the root (i.e. provided bidsPath -> bidsPath/specificFolder) or in the derivative (i.e. bidsPath/derivatives -> bidsPath/derivatives/specificFolder) based on the derivative flag!  
+
+### Supported EEG file types
+- edf
+- vhdr
+- fif
+- set
 
 ## Contributions
 
