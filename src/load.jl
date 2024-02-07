@@ -196,6 +196,7 @@ function load_bids_eeg_data(bidsPath::AbstractString;
 #-----------------------------------------------------------------------------------------------
 
 # Function to load events of all subjects from CSV file into DataFrame
+# The function is deprecated but kept for convenience
 
 function collectEvents(subjects::Vector{Any}, CSVPath::String; delimiter=nothing)
 	AllEvents = DataFrame()
@@ -213,7 +214,7 @@ end
 
 #-----------------------------------------------------------------------------------------------
 
-# Function to find and load all events files into LayoutDataFrame
+# Function to find and load all events file-paths into LayoutDataFrame
 
 function addEventFiles!(layoutDF)
     
@@ -245,4 +246,21 @@ end
     layoutDF.events = allFiles
 
 return layoutDF
+end
+
+#-----------------------------------------------------------------------------------------------
+
+# Function to find and load all events files into a DataFrame
+
+function load_events(layoutDF::DataFrame; kwargs...)
+	
+	all_events = DataFrame()
+	
+	for s in eachrow(layoutDF)
+		events = CSV.read(joinpath(s.path,s.events),DataFrame; kwargs...)
+		events.subject .= s.subject
+		append!(all_events, events)
+	end
+	
+	return all_events
 end
