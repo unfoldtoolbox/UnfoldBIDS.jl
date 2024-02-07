@@ -199,11 +199,8 @@ function load_bids_eeg_data(bidsPath::AbstractString;
 #-----------------------------------------------------------------------------------------------
 
 # Function to load events of all subjects from CSV file into DataFrame
-<<<<<<< HEAD
 # The function is deprecated but kept for convenience
-=======
 # NOTE: This is old and should be renamed; kept for now
->>>>>>> cea05074f10e15b4fbc20fc3d287755980b68921
 
 function collectEvents(subjects::Vector{Any}, CSVPath::String; delimiter=nothing)
     AllEvents = DataFrame()
