@@ -1,4 +1,8 @@
 [deps]
-DataDeps = "124859b0-ceae-595e-8997-d05f6a7a8dfe"
+CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
-UnfoldBIDS = "b54e767b-1ebd-4480-ac2a-f5f4d8853074"
+Glob = "c27321d9-0574-5035-807b-f59d2c89b15c"
+Literate = "98b081ad-f1c9-55d3-8b20-4c87d4299306"
+LiveServer = "16fef848-5104-11e9-1b77-fb7a48bbb589"
+Unfold = "181c99d8-e21b-4ff3-b70b-c233eddec679"
