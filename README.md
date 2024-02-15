@@ -110,7 +110,7 @@ You are very welcome to raise issues and start pull requests!
   <tbody>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="http://www.benediktehinger.de"><img src="https://avatars.githubusercontent.com/u/10183650?v=4?s=100" width="100px;" alt="Benedikt Ehinger"/><br /><sub><b>Benedikt Ehinger</b></sub></a><br /><a href="#bug-behinger" title="Bug reports">🐛</a> <a href="#code-behinger" title="Code">💻</a> <a href="#projectManagement-behinger" title="Project Management">📆</a> <a href="#ideas-behinger" title="Ideas, Planning, & Feedback">🤔</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://reneskukies.de/"><img src="https://avatars.githubusercontent.com/u/57703446?v=4?s=100" width="100px;" alt="René Skukies"/><br /><sub><b>René Skukies</b></sub></a><br /><a href="#review-ReneSkukies" title="Reviewed Pull Requests">👀</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://reneskukies.de/"><img src="https://avatars.githubusercontent.com/u/57703446?v=4?s=100" width="100px;" alt="René Skukies"/><br /><sub><b>René Skukies</b></sub></a><br /><a href="#review-ReneSkukies" title="Reviewed Pull Requests">👀</a> <a href="#ideas-ReneSkukies" title="Ideas, Planning, & Feedback">🤔</a> <a href="#code-ReneSkukies" title="Code">💻</a> <a href="#bug-ReneSkukies" title="Bug reports">🐛</a></td>
     </tr>
   </tbody>
 </table>
