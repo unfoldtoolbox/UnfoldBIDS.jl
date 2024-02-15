@@ -1,3 +1,1 @@
-```@autodocs
-Modules = [UnfoldBIDS]
-```
+
