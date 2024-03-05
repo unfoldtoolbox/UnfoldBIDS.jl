@@ -36,6 +36,7 @@ makedocs(;
         ],
         "Reference" => [
             "Overview: Toolbox Functions" => "./generated/reference/overview.md",
+            "Brain Imaging Data Structure" => "./generated/reference/BIDS.md"
         ],
         "HowTo" => [
             "Apply preprocessing functions" => "./generated/HowTo/ApplyPreprocessing.md",
