@@ -45,23 +45,20 @@ function rawToData(raw, tmpEvents; channels::AbstractVector{<:Union{String,Integ
     return pyconvert(Array, raw.get_data(picks=pylist(channels), units="uV"))
 end
 
-# Calculate Grand average; this is likely a TODO
-# Commented this out for now as this might go into UnfoldStats; R.S. 18/01/24
+# Unpack events into tidy data frame; useful with AlgebraOfGraphics.jl
+function unpack_events(df::DataFrame)
 
-#=
-function calculateGA(resultsDF; channels=:false)
-	GA = @chain resultsDF begin
-		# TODO: check if this works
-		if channels
-			@subset(:channel .== channels)
-		end
-		# need to check which variables to use
-		@by([:basisname,:coefname,:time, :channel], :estimate = mean(estimate))
+	all_events = DataFrame()
+	for row in eachrow(df)
+		tmp_df = row.events
+		tmp_df.subject .= row.subject
+		tmp_df.task .= row.task
+		tmp_df.run .= row.run
+		append!(all_events, tmp_df)
 	end
 
-
+	return all_events
 end
-=#
 
 #=
 # Function to run unfold on epoched data

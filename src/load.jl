@@ -53,17 +53,23 @@ function bidsLayout(bidsPath::AbstractString;
     end
 
 
-    files_df = DataFrame(subject=[], file=[], path=[])  # Initialize an empty DataFrame to hold results
+    files_df = DataFrame(subject=[], task=[], run=[], file=[], path=[])  # Initialize an empty DataFrame to hold results
+
+    # regular expression for additional information
+    regex = r"sub-(.+)_task-(.+)_run-(.+)_eeg"
 
     # Search for files matching file pattern
     if specificFolder !== nothing
         for (root, dirs, files) in walkdir(sPath)
             for file in files
+
                 if sum(occursin.(file_pattern, file)) >= nPattern
 
-                    sub_string = match(r"sub-\d{3}", file)
-                    sub = last(sub_string.match, 3)
-                    push!(files_df, (sub, file, root))
+                    matches = match(regex, file).captures
+                    sub = matches[1]
+                    task = matches[2]
+                    run = matches[3]
+                    push!(files_df, (sub, task, run, file, root))
                 end
             end
         end
@@ -75,17 +81,19 @@ function bidsLayout(bidsPath::AbstractString;
                 if sum(occursin.(file_pattern, file)) >= nPattern &&
                    (derivative && (exclude == "" || !any(occursin.(exclude, root))) ||
                     (!derivative && !any(occursin.(exclude, root))))
-                    sub_string = match(r"^sub-\d{1,}", file)
-                    sub = split(sub_string.match, "sub-")[2] # always #2 because the regexp has a lookup from front ^
 
-                    push!(files_df, (sub, file, root))
+                    matches = match(regex, file).captures
+                    sub = matches[1]
+                    task = matches[2]
+                    run = matches[3]
+                    push!(files_df, (sub, task, run, file, root))
                 end
             end
         end
     end
 
+
     # add events File names
-    # TODO: Check if adding events paths to the dataframe actually works; R.S. 01/24
     try
         addEventFiles!(files_df)
     catch
@@ -97,7 +105,7 @@ end
 
 #-----------------------------------------------------------------------------------------------
 # Function loading BIDS data given bidsLayout DataFrame
-function load_bids_eeg_data(layout_df; verbose::Bool=true)
+function load_bids_eeg_data(layout_df; verbose::Bool=true, kwargs...)
 
     # Initialize an empty dataframe
     eeg_df = DataFrame()
@@ -123,20 +131,21 @@ function load_bids_eeg_data(layout_df; verbose::Bool=true)
             eeg_data = PyMNE.io.read_raw_eeglab(file_path, verbose="ERROR")
         end
 
-        #############
-        # TODO: Append specific subject data to dataframe
-        #############
-        # Add the EEG data to the main dataframe, along with subject and task information
-        #subject_id, task_id = match(r"sub-(.+)_task-(.*)_eeg", basename(file_path)).captures
-        #eeg_data.subject_id .= subject_id
-        #eeg_data.task_id .= task_id
-        tmp_df = DataFrame(subject=row.subject, data=eeg_data)
+        tmp_df = DataFrame(subject=row.subject, task=row.task, run=row.run, data=eeg_data)
 
         # TODO: Add events DataFrames as additional collumn per subject
 
         append!(eeg_df, tmp_df)
     end
 
+    # try to add events
+    try
+        events = UnfoldBIDS.load_events(layout_df; kwargs...)
+        eeg_df[!,:events] = events.events
+    catch
+        @warn "Something went wrong while adding events to DataFrame. Needs manual intervention."
+    end
+    
     # Return the combined EEG data dataframe
     return eeg_df
 end
@@ -249,7 +258,7 @@ function addEventFiles!(layoutDF)
 
     layoutDF.events = allFiles
 
-return layoutDF
+    return layoutDF
 end
 
 #-----------------------------------------------------------------------------------------------
@@ -257,14 +266,14 @@ end
 # Function to find and load all events files into a DataFrame
 
 function load_events(layoutDF::DataFrame; kwargs...)
-	
-	all_events = DataFrame()
-	
-	for s in eachrow(layoutDF)
-		events = CSV.read(joinpath(s.path,s.events),DataFrame; kwargs...)
-		events.subject .= s.subject
-		append!(all_events, events)
-	end
-	
-	return all_events
+
+    all_events = DataFrame()
+
+    for s in eachrow(layoutDF)
+        events = CSV.read(joinpath(s.path, s.events), DataFrame; kwargs...)
+        #events.subject .= s.subject
+        append!(all_events, DataFrame(subject=s.subject, task=s.task, run=s.run, events=events))
+    end
+
+    return all_events
 end
