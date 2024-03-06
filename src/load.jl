@@ -94,6 +94,7 @@ function bidsLayout(bidsPath::AbstractString;
 
 
     # add events File names
+    # TODO: Check if adding events paths to the dataframe actually works; R.S. 01/24
     try
         addEventFiles!(files_df)
     catch

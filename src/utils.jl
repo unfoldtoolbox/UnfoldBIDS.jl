@@ -2,7 +2,13 @@
 
 #function rununfold(eeg_df,formula=xy,channels=xy,[basisfunction=FIR | taus = [-0.3,1.] ,...)
 
+<<<<<<< HEAD
 #=
+=======
+# TODO: Make function that collects all events into one tidy DataFrame for easy plotting
+# TODO: Paralelization of fitting
+
+>>>>>>> 6552ae5ac7a3758eb026f07770ef34c11c4d6f17
 """
 
 - removeTimeexpandedXs (true): Removes the timeexpanded designmatrix which significantly reduces the memory-consumption. This Xs is rarely needed, but can be recovered (look into the Unfold.load function)
