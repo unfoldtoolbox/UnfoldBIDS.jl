@@ -1,6 +1,6 @@
 # ![UnfoldBIDS](https://github.com/unfoldtoolbox/UnfoldBIDS.jl/assets/57703446/60678439-dae5-475a-9764-d021a445950d)
 
-[![Stable][Doc-img]][Doc-url] [![Dev][dev-img]][dev-url] [![Build Status][build-img]][build-url]
+[![Dev][dev-img]][dev-url] [![Build Status][build-img]][build-url]
 [![Coverage](https://codecov.io/gh/unfoldtoolbox/UnfoldBIDS.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/unfoldtoolbox/UnfoldBIDS.jl)
 
 [Doc-img]: https://img.shields.io/badge/docs-stable-blue.svg
