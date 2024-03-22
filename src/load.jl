@@ -56,7 +56,8 @@ function bidsLayout(bidsPath::AbstractString;
     files_df = DataFrame(subject=[], task=[], run=[], file=[], path=[])  # Initialize an empty DataFrame to hold results
 
     # regular expression for additional information
-    regex = r"sub-(.+)_task-(.+)_run-(.+)_eeg"
+    # regex = r"sub-(.+)|_task-(.+)|_run-(.+)_eeg"
+
 
     # Search for files matching file pattern
     if specificFolder !== nothing
@@ -65,11 +66,7 @@ function bidsLayout(bidsPath::AbstractString;
 
                 if sum(occursin.(file_pattern, file)) >= nPattern
 
-                    matches = match(regex, file).captures
-                    sub = matches[1]
-                    task = matches[2]
-                    run = matches[3]
-                    push!(files_df, (sub, task, run, file, root))
+                    get_info!(files_df, root, file)
                 end
             end
         end
@@ -82,11 +79,7 @@ function bidsLayout(bidsPath::AbstractString;
                    (derivative && (exclude == "" || !any(occursin.(exclude, root))) ||
                     (!derivative && !any(occursin.(exclude, root))))
 
-                    matches = match(regex, file).captures
-                    sub = matches[1]
-                    task = matches[2]
-                    run = matches[3]
-                    push!(files_df, (sub, task, run, file, root))
+                    get_info!(files_df, root, file)
                 end
             end
         end
@@ -101,6 +94,27 @@ function bidsLayout(bidsPath::AbstractString;
         @warn "Something went wrong with tsv file detection. Needs manual intervention."
     end
 
+    return files_df
+end
+
+#
+# get subject and file information
+function get_info!(files_df, root, file)
+
+    # Make regex for parts
+    regex_sub = r"sub-(\d+)"
+    regex_task = r"task-(.+?)_"
+    regex_run = r"run-(\d+)"
+
+    # Match and add to DataFrame
+    sub = match(regex_sub, file)
+    task = match(regex_task, file)
+    run = match(regex_run, file)
+    push!(files_df, (
+        !isnothing(sub) ? sub.captures[1] : missing,
+        !isnothing(task) ? task.captures[1] : missing,
+        !isnothing(run) ? run.captures[1] : missing,
+        file, root))
     return files_df
 end
 
@@ -142,11 +156,11 @@ function load_bids_eeg_data(layout_df; verbose::Bool=true, kwargs...)
     # try to add events
     try
         events = UnfoldBIDS.load_events(layout_df; kwargs...)
-        eeg_df[!,:events] = events.events
+        eeg_df[!, :events] = events.events
     catch
         @warn "Something went wrong while adding events to DataFrame. Needs manual intervention."
     end
-    
+
     # Return the combined EEG data dataframe
     return eeg_df
 end
