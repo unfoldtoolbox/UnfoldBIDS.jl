@@ -11,23 +11,17 @@ function bids_layout(bidsPath::AbstractString;
     nPattern = 2
 
     # Extend file pattern
-    if ses === nothing
-        @warn "No session provided, will load all sessions!!"
-    else
+    if ses !== nothing
         file_pattern = push!(file_pattern, "ses-" * ses)
         nPattern += 1
     end
 
-    if task === nothing
-        @warn "No task provided, will load all tasks!!"
-    else
+    if task !== nothing
         file_pattern = push!(file_pattern, "task-" * task)
         nPattern += 1
     end
 
-    if run === nothing
-        @warn "No run provided, will load all runs!!"
-    else
+    if run !== nothing
         file_pattern = push!(file_pattern, "run-" * run)
         nPattern += 1
     end
@@ -53,7 +47,7 @@ function bids_layout(bidsPath::AbstractString;
     end
 
 
-    files_df = DataFrame(subject=[], task=[], run=[], file=[], path=[])  # Initialize an empty DataFrame to hold results
+    files_df = DataFrame(subject=[], ses=[], task=[], run=[], file=[], path=[])  # Initialize an empty DataFrame to hold results
 
     # regular expression for additional information
     # regex = r"sub-(.+)|_task-(.+)|_run-(.+)_eeg"
@@ -85,11 +79,12 @@ function bids_layout(bidsPath::AbstractString;
         end
     end
 
+    # Check for multiple session/tasks/runs
+    check_df(files_df, ses, task, run)
 
     # add events File names
-    # TODO: Check if adding events paths to the dataframe actually works; R.S. 01/24
     try
-        addEventFiles!(files_df)
+        add_event_files!(files_df)
     catch
         @warn "Something went wrong with tsv file detection. Needs manual intervention."
     end
@@ -103,21 +98,37 @@ function get_info!(files_df, root, file)
 
     # Make regex for parts
     regex_sub = r"sub-(\d+)"
+    regex_ses = r"ses-(.+?)_"
     regex_task = r"task-(.+?)_"
     regex_run = r"run-(\d+)"
 
     # Match and add to DataFrame
     sub = match(regex_sub, file)
+    ses = match(regex_ses, file)
     task = match(regex_task, file)
     run = match(regex_run, file)
     push!(files_df, (
         !isnothing(sub) ? sub.captures[1] : missing,
+        !isnothing(ses) ? ses.captures[1] : missing,
         !isnothing(task) ? task.captures[1] : missing,
         !isnothing(run) ? run.captures[1] : missing,
         file, root))
     return files_df
 end
 
+function check_df(files_df, ses, task, run)
+    if ses === nothing && files_df.ses !== missing && length(unique(files_df.ses)) > 1
+        @warn "You provided no session, however I found multiple session so I loaded all of them! Please check if that was intended."
+    end
+
+    if task === nothing && files_df.task !== missing && length(unique(files_df.task)) > 1
+        @warn "You provided no task, however I found multiple task so I loaded all of them! Please check if that was intended."
+    end
+
+    if run === nothing && files_df.run !== missing && length(unique(files_df.run)) > 1
+        @warn "You provided no run, however I found multiple run so I loaded all of them! Please check if that was intended."
+    end
+end
 #-----------------------------------------------------------------------------------------------
 # Function loading BIDS data given bidsLayout DataFrame
 function load_bids_eeg_data(layout_df; verbose::Bool=true, kwargs...)
@@ -164,61 +175,6 @@ function load_bids_eeg_data(layout_df; verbose::Bool=true, kwargs...)
     # Return the combined EEG data dataframe
     return eeg_df
 end
-#-----------------------------------------------------------------------------------------------
-
-# Function loading BIDS data directly by calling bidsLayout
-#=
-function load_bids_eeg_data(bidsPath::AbstractString;
-							derivative::Bool=true,
-							specificFolder::Union{Nothing,AbstractString}=nothing,
-							excludeFolder::Union{Nothing,AbstractString}=nothing,
-							task::Union{Nothing,AbstractString}=nothing,
-							run::Union{Nothing,AbstractString}=nothing)
-
-	    # Find all EEG data files in the BIDS directory
-		layout_df = bidsLayout(bidsPath=bidsPath;
-								derivative=derivative,
-								specificFolder=specificFolder,
-								excludeFolder=excludeFolder,
-								task=task,
-								run=run)
-
-	    # Initialize an empty dataframe
-	    eeg_df = DataFrame()
-
-	    # Loop through each EEG data file
-	    for row in eachrow(layout_df)
-			file_path = joinpath(row.path,row.file)
-			@printf("Loading subject %s at:\n %s \n",row.subject, file_path)
-
-	        # Read in the EEG data as a dataframe using the appropriate reader
-	        if endswith(file_path, ".edf")
-	            eeg_data = PyMNE.io.read_raw_edf(file_path, verbose="ERROR")
-	        elseif endswith(file_path, ".vhdr")
-	            eeg_data = PyMNE.io.read_raw_brainvision(file_path, verbose="ERROR")
-	        elseif endswith(file_path, ".fif")
-	            eeg_data = PyMNE.io.read_raw_fif(file_path, verbose="ERROR")
-			elseif endswith(file_path, ".set")
-				eeg_data = PyMNE.io.read_raw_eeglab(file_path, verbose="ERROR")
-			end
-
-			#############
-			# TODO: Append specific subject data to dataframe
-			#############
-			# Add the EEG data to the main dataframe, along with subject and task information
-	        #subject_id, task_id = match(r"sub-(.+)_task-(.*)_eeg", basename(file_path)).captures
-	        #eeg_data.subject_id .= subject_id
-	        #eeg_data.task_id .= task_id
-	        tmp_df = DataFrame(subject = row.subject, data = eeg_data)
-
-			append!(eeg_df, tmp_df)
-	    end
-
-	    # Return the combined EEG data dataframe
-	    return eeg_df
-	end
-=#
-
 
 #-----------------------------------------------------------------------------------------------
 
@@ -241,10 +197,13 @@ function collect_events(subjects::Vector{Any}, CSVPath::String; delimiter=nothin
 end
 
 #-----------------------------------------------------------------------------------------------
+"""
+    add_event_files!(layoutDF)
 
-# Function to find and load all events file-paths into LayoutDataFrame
+Function to find and load all events file-paths into Layout-DataFrame.
+"""
 
-function addEventFiles!(layoutDF)
+function add_event_files!(layoutDF)
 
     allFiles = []
     # Do some stuff @byrow, i.e. find the tsv files

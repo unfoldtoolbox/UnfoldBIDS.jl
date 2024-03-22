@@ -7,10 +7,10 @@
 
 - removeTimeexpandedXs (true): Removes the timeexpanded designmatrix which significantly reduces the memory-consumption. This Xs is rarely needed, but can be recovered (look into the Unfold.load function)
 
-extractData (function) - specify the function that translate the MNE Raw object to an data array. Default is `rawToData` which uses get_data and allows to pick `channels` - see @Ref(`rawToData`). The optional kw- arguments (e.g. channels) need to be specified directly in the `runUnfold` function as kw-args
+extractData (function) - specify the function that translate the MNE Raw object to an data array. Default is `rawToData` which uses get_data and allows to pick `channels` - see @Ref(`raw_to_data`). The optional kw- arguments (e.g. channels) need to be specified directly in the `run_unfold` function as kw-args
 """
 =#
-function run_unfold(dataDF, eventsDF, bfDict; eventcolumn="event",removeTimeexpandedXs=true, extractData = rawToData,kwargs...)
+function run_unfold(dataDF, bfDict; eventcolumn="event",removeTimeexpandedXs=true, extract_data = raw_to_data,kwargs...)
 	subjects = unique(dataDF.subject)
 
     resultsDF = DataFrame()
@@ -18,11 +18,11 @@ function run_unfold(dataDF, eventsDF, bfDict; eventcolumn="event",removeTimeexpa
     for sub in subjects
 
         # Get current subject
-        raw = @subset(dataDF, :subject .== sub).data
+        tmpDF = @subset(dataDF, :subject .== sub)
 
-        tmpEvents = @subset(eventsDF, :subject .== sub)
+        tmpEvents = tmpDF[1,:].events
 
-        tmpData = extractData(raw[1], tmpEvents; kwargs...)
+        tmpData = extract_data(tmpDF.data[1]; kwargs...)
 
 
         # Fit Model
@@ -41,11 +41,18 @@ function run_unfold(dataDF, eventsDF, bfDict; eventcolumn="event",removeTimeexpa
 end
 
 # Function to run Preprocessing functions on data
-function rawToData(raw, tmpEvents; channels::AbstractVector{<:Union{String,Integer}}=[])
+function raw_to_data(raw; channels::AbstractVector{<:Union{String,Integer}}=[])
     return pyconvert(Array, raw.get_data(picks=pylist(channels), units="uV"))
 end
 
-# Unpack events into tidy data frame; useful with AlgebraOfGraphics.jl
+"""
+	unpack_events(df::DataFrame)
+
+Unpack events into tidy data frame; useful with AlgebraOfGraphics.jl
+
+df is expected to be a UnfoldBIDS DataFrame where events are loaded already.
+"""
+
 function unpack_events(df::DataFrame)
 
 	all_events = DataFrame()
