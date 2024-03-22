@@ -10,7 +10,7 @@
 extractData (function) - specify the function that translate the MNE Raw object to an data array. Default is `rawToData` which uses get_data and allows to pick `channels` - see @Ref(`rawToData`). The optional kw- arguments (e.g. channels) need to be specified directly in the `runUnfold` function as kw-args
 """
 =#
-function runUnfold(dataDF, eventsDF, bfDict; eventcolumn="event",removeTimeexpandedXs=true, extractData = rawToData,kwargs...)
+function run_unfold(dataDF, eventsDF, bfDict; eventcolumn="event",removeTimeexpandedXs=true, extractData = rawToData,kwargs...)
 	subjects = unique(dataDF.subject)
 
     resultsDF = DataFrame()

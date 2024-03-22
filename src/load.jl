@@ -1,4 +1,4 @@
-function bidsLayout(bidsPath::AbstractString;
+function bids_layout(bidsPath::AbstractString;
     derivative::Bool=true,
     specificFolder::Union{Nothing,AbstractString}=nothing,
     excludeFolder::Union{Nothing,AbstractString}=nothing,
@@ -226,7 +226,7 @@ function load_bids_eeg_data(bidsPath::AbstractString;
 # The function is deprecated but kept for convenience
 # NOTE: This is old and should be renamed; kept for now
 
-function collectEvents(subjects::Vector{Any}, CSVPath::String; delimiter=nothing)
+function collect_events(subjects::Vector{Any}, CSVPath::String; delimiter=nothing)
     AllEvents = DataFrame()
     for sub in subjects
         pathFormated = Printf.Format(CSVPath)

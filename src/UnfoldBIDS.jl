@@ -4,7 +4,6 @@ module UnfoldBIDS
 using StatsModels, DataFrames, DataFramesMeta, Statistics, Printf
 using ProgressBars
 # file loading
-#using PyMNE, CSVFiles, DelimitedFiles, Glob
 using PyMNE, CSV
 # unfold
 using Unfold
@@ -16,10 +15,10 @@ include("load.jl")
 include("utils.jl")
 
 # Export list
-export bidsLayout
+export bids_layout
 export load_bids_eeg_data
-export collectEvents
-export runUnfold
+export collect_events
+export run_unfold
 #export epochedFit
 
 import StatsModels.FormulaTerm # for exporting
