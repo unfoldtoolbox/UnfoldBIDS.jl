@@ -1,0 +1,7 @@
+[sample_BIDS]
+git-tree-sha1 = "070547fd4f80b67b4dd879c1a3f9db9097226f48"
+lazy = true
+
+    [[sample_BIDS.download]]
+    sha256 = "7d4ae8a35f622919c47bc1e8c561d540ec44546fc4d05b430374fde7dca7665c"
+    url = "https://osf.io/download/n4e7c/"
