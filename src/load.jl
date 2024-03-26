@@ -68,6 +68,7 @@ function bids_layout(bidsPath::AbstractString;
         # When no specific folder is given look up whole Path    
     else
         for (root, dirs, files) in walkdir(bidsPath)
+            #filter(x->!startswith(x, '.'), files)
             for file in files
                 if sum(occursin.(file_pattern, file)) >= nPattern &&
                    (derivative && (exclude == "" || !any(occursin.(exclude, root))) ||
@@ -118,15 +119,15 @@ end
 
 function check_df(files_df, ses, task, run)
     if ses === nothing && files_df.ses !== missing && length(unique(files_df.ses)) > 1
-        @warn "You provided no session, however I found multiple session so I loaded all of them! Please check if that was intended."
+        @warn "You provided no session, however I found multiple sessions so I loaded all of them! Please check if that was intended."
     end
 
     if task === nothing && files_df.task !== missing && length(unique(files_df.task)) > 1
-        @warn "You provided no task, however I found multiple task so I loaded all of them! Please check if that was intended."
+        @warn "You provided no task, however I found multiple tasks so I loaded all of them! Please check if that was intended."
     end
 
     if run === nothing && files_df.run !== missing && length(unique(files_df.run)) > 1
-        @warn "You provided no run, however I found multiple run so I loaded all of them! Please check if that was intended."
+        @warn "You provided no run, however I found multiple runs so I loaded all of them! Please check if that was intended."
     end
 end
 #-----------------------------------------------------------------------------------------------
