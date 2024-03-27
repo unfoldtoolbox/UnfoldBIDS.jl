@@ -1,5 +1,5 @@
 function bids_layout(bidsPath::AbstractString;
-    derivative::Bool=true,
+    derivatives::Bool=true,
     specificFolder::Union{Nothing,AbstractString}=nothing,
     excludeFolder::Union{Nothing,AbstractString}=nothing,
     ses::Union{Nothing,AbstractString}=nothing,
@@ -7,77 +7,63 @@ function bids_layout(bidsPath::AbstractString;
     run::Union{Nothing,AbstractString}=nothing)
 
     # Any files with these endings will be returned
-    file_pattern = ["eeg", "set", "fif", "vhdr", "edf"]
-    nPattern = 2
+    file_ending = [".eeg", ".set", ".fif", ".vhdr", ".edf"]
 
+    file_pattern = [""]
     # Extend file pattern
     if ses !== nothing
         file_pattern = push!(file_pattern, "ses-" * ses)
-        nPattern += 1
     end
 
     if task !== nothing
         file_pattern = push!(file_pattern, "task-" * task)
-        nPattern += 1
     end
 
     if run !== nothing
         file_pattern = push!(file_pattern, "run-" * run)
-        nPattern += 1
+    end
+
+    # Choose what to ignore and check if derivatives should be used
+    exclude = [] 
+    if derivatives
+        # TODO: Bug in loading only derivatives
+        bidsPath = joinpath(bidsPath, "derivatives")
+    else
+        push!(exclude, "derivatives")
+    end
+
+    if excludeFolder !== nothing
+        exclude = push!(exclude, excludeFolder)
     end
 
     # Choose a specific folder in either ./ or ./derivatives
-    if derivative && specificFolder !== nothing
-        sPath = joinpath(bidsPath, "derivatives", specificFolder)
-        #@show sPath
-    elseif specificFolder !== nothing
-        sPath = joinpath(bidsPath, specificFolder)
-        #@show sPath
-    end
-
-    # Exclude these folders when using raw data
-    if derivative && excludeFolder !== nothing
-        exclude = excludeFolder
-    elseif !derivative && excludeFolder !== nothing
-        exclude = ["derivatives", excludeFolder]
-    elseif !derivative
-        exclude = "derivatives"
-    else
-        exclude = ""
-    end
-
-
-    files_df = DataFrame(subject=[], ses=[], task=[], run=[], file=[], path=[])  # Initialize an empty DataFrame to hold results
-
-    # regular expression for additional information
-    # regex = r"sub-(.+)|_task-(.+)|_run-(.+)_eeg"
-
-
-    # Search for files matching file pattern
     if specificFolder !== nothing
-        for (root, dirs, files) in walkdir(sPath)
-            for file in files
+        bidsPath = joinpath(bidsPath, specificFolder)
+    end
 
-                if sum(occursin.(file_pattern, file)) >= nPattern
 
-                    get_info!(files_df, root, file)
-                end
+
+    files_df = DataFrame(subject=[], ses=[], task=[], run=[], file=[])  # Initialize an empty DataFrame to hold results
+
+    list_all_eegpaths(path) = @cont begin
+        if isfile(path)
+            (any(endswith.(path, file_ending)) & all(occursin.(file_pattern, path))) && cont(path)
+        elseif isdir(path)
+            startswith(basename(path), ".") && return # skip all hidden files/ paths
+            if exclude !== nothing
+                basename(path) in (exclude...,) && return
+            end
+            for file in readdir(path)
+                foreach(cont, list_all_eegpaths(joinpath(path, file)))
             end
         end
+    end
 
-        # When no specific folder is given look up whole Path    
-    else
-        for (root, dirs, files) in walkdir(bidsPath)
-            #filter(x->!startswith(x, '.'), files)
-            for file in files
-                if sum(occursin.(file_pattern, file)) >= nPattern &&
-                   (derivative && (exclude == "" || !any(occursin.(exclude, root))) ||
-                    (!derivative && !any(occursin.(exclude, root))))
+    all_paths = collect(list_all_eegpaths(abspath(bidsPath)))
 
-                    get_info!(files_df, root, file)
-                end
-            end
-        end
+    # Add additional information
+    for path in all_paths
+        get_info!(files_df, path)
     end
 
     # Check for multiple session/tasks/runs
@@ -95,7 +81,7 @@ end
 
 #
 # get subject and file information
-function get_info!(files_df, root, file)
+function get_info!(files_df, file)
 
     # Make regex for parts
     regex_sub = r"sub-(\d+)"
@@ -113,9 +99,15 @@ function get_info!(files_df, root, file)
         !isnothing(ses) ? ses.captures[1] : missing,
         !isnothing(task) ? task.captures[1] : missing,
         !isnothing(run) ? run.captures[1] : missing,
-        file, root))
+        file))
     return files_df
 end
+
+"""
+check_df(files_df, ses, task, run)
+
+Internal; Checks if the multiple sessions/task/runs are found if none of these are provided
+"""
 
 function check_df(files_df, ses, task, run)
     if ses === nothing && files_df.ses !== missing && length(unique(files_df.ses)) > 1
@@ -209,12 +201,12 @@ function add_event_files!(layoutDF)
     allFiles = []
     # Do some stuff @byrow, i.e. find the tsv files
     for s in eachrow(layoutDF)
-        eegFile = s.file
+        eegFile = basename(s.file)
         subStr = findlast("eeg", eegFile)[1]
         tmpFile = eegFile[begin:subStr-1] * "events.tsv"
 
         # Check if file exists
-        files = readdir(s.path) # Gives all files as Vector of strings
+        files = readdir(replace(s.file, basename(eegFile) => "")) # Gives all files as Vector of strings
 
         tmpIdx = occursin.(tmpFile, files)
 

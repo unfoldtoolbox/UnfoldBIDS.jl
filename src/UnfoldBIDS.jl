@@ -2,7 +2,7 @@ module UnfoldBIDS
 
 # basics
 using StatsModels, DataFrames, DataFramesMeta, Statistics, Printf
-using ProgressBars
+using ProgressBars, Continuables
 # file loading
 using PyMNE, CSV
 # unfold
