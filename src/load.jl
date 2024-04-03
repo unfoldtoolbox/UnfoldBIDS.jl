@@ -26,7 +26,6 @@ function bids_layout(bidsPath::AbstractString;
     # Choose what to ignore and check if derivatives should be used
     exclude = [] 
     if derivatives
-        # TODO: Bug in loading only derivatives
         bidsPath = joinpath(bidsPath, "derivatives")
     else
         push!(exclude, "derivatives")
@@ -60,6 +59,8 @@ function bids_layout(bidsPath::AbstractString;
     end
 
     all_paths = collect(list_all_eegpaths(abspath(bidsPath)))
+
+    if isempty(all_paths); throw("No files found at $bidsPath; make sure you have the right path and that your directory is BIDS compatible."); end
 
     # Add additional information
     for path in all_paths
@@ -133,7 +134,7 @@ function load_bids_eeg_data(layout_df; verbose::Bool=true, kwargs...)
 
     # Loop through each EEG data file
     for row in eachrow(layout_df)
-        file_path = joinpath(row.path, row.file)
+        file_path = row.file
         if verbose
             update(pbar)
             #@printf("Loading subject %s at:\n %s \n",row.subject, file_path)
@@ -150,9 +151,7 @@ function load_bids_eeg_data(layout_df; verbose::Bool=true, kwargs...)
             eeg_data = PyMNE.io.read_raw_eeglab(file_path, verbose="ERROR")
         end
 
-        tmp_df = DataFrame(subject=row.subject, task=row.task, run=row.run, data=eeg_data)
-
-        # TODO: Add events DataFrames as additional collumn per subject
+        tmp_df = DataFrame(subject=row.subject, ses=row.ses, task=row.task, run=row.run, data=eeg_data)
 
         append!(eeg_df, tmp_df)
     end
@@ -237,7 +236,8 @@ function load_events(layoutDF::DataFrame; kwargs...)
     all_events = DataFrame()
 
     for s in eachrow(layoutDF)
-        events = CSV.read(joinpath(s.path, s.events), DataFrame; kwargs...)
+        path = replace(s.file, basename(s.file) => "")
+        events = CSV.read(joinpath(path, s.events), DataFrame; kwargs...)
         #events.subject .= s.subject
         append!(all_events, DataFrame(subject=s.subject, task=s.task, run=s.run, events=events))
     end
