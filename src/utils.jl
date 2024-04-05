@@ -1,15 +1,12 @@
-# Apply Unfold 
-
-#function rununfold(eeg_df,formula=xy,channels=xy,[basisfunction=FIR | taus = [-0.3,1.] ,...)
-
-#=
 """
+	run_unfold(dataDF, bfDict; eventcolumn="event",removeTimeexpandedXs=true, extract_data = raw_to_data, verbose::Bool=true, kwargs...)
+
 
 - removeTimeexpandedXs (true): Removes the timeexpanded designmatrix which significantly reduces the memory-consumption. This Xs is rarely needed, but can be recovered (look into the Unfold.load function)
 
 extractData (function) - specify the function that translate the MNE Raw object to an data array. Default is `rawToData` which uses get_data and allows to pick `channels` - see @Ref(`raw_to_data`). The optional kw- arguments (e.g. channels) need to be specified directly in the `run_unfold` function as kw-args
 """
-=#
+
 function run_unfold(dataDF, bfDict; eventcolumn="event",removeTimeexpandedXs=true, extract_data = raw_to_data, verbose::Bool=true, kwargs...)
 
     resultsDF = DataFrame()

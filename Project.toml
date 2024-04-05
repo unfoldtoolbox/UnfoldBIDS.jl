@@ -1,6 +1,6 @@
 name = "UnfoldBIDS"
 uuid = "b54e767b-1ebd-4480-ac2a-f5f4d8853074"
-authors = ["Rene Skukies", "Benedikt Ehinger", "Jan Haas"]
+authors = ["Rene Skukies", "Benedikt Ehinger"]
 version = "0.1.0"
 
 [deps]
@@ -13,21 +13,23 @@ DataFramesMeta = "1313f7d8-7da2-5740-9ea0-a2ca25f37964"
 Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
 ProgressBars = "49802e3a-d2f1-5c88-81d8-b72133a6f568"
 PyMNE = "6c5003b2-cbe8-491c-a0d1-70088e6a0fd6"
-Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 StatsModels = "3eaba693-59b7-5ba5-a881-562e759f1c8d"
 Unfold = "181c99d8-e21b-4ff3-b70b-c233eddec679"
 
 [compat]
+Artifacts = "1"
 CSV = "0.10"
 CSVFiles = "1"
-DataFrames = "1"
+Continuables = "1.0"
+DataFrames = "1 - 1.6"
 DataFramesMeta = "0.14"
-ProgressBars = "1"
+Printf = "1"
+ProgressBars = "1.5"
 PyMNE = "0.1, 0.2"
-Revise = "3"
+Statistics = "1.1"
 StatsModels = "0.6, 0.7"
-Unfold = "0.3, 0.4, 0.5, 0.6"
+Unfold = "0.5, 0.6"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
