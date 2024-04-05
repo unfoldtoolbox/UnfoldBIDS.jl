@@ -19,6 +19,8 @@ export bids_layout
 export load_bids_eeg_data
 export collect_events
 export run_unfold
+export bids_coeftable
+export unpack_events, unpack_results
 #export epochedFit
 
 import StatsModels.FormulaTerm # for exporting
