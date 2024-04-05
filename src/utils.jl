@@ -7,97 +7,111 @@
 
 - removeTimeexpandedXs (true): Removes the timeexpanded designmatrix which significantly reduces the memory-consumption. This Xs is rarely needed, but can be recovered (look into the Unfold.load function)
 
-extractData (function) - specify the function that translate the MNE Raw object to an data array. Default is `rawToData` which uses get_data and allows to pick `channels` - see @Ref(`rawToData`). The optional kw- arguments (e.g. channels) need to be specified directly in the `runUnfold` function as kw-args
+extractData (function) - specify the function that translate the MNE Raw object to an data array. Default is `rawToData` which uses get_data and allows to pick `channels` - see @Ref(`raw_to_data`). The optional kw- arguments (e.g. channels) need to be specified directly in the `run_unfold` function as kw-args
 """
 =#
-function runUnfold(dataDF, eventsDF, bfDict; eventcolumn="event",removeTimeexpandedXs=true, extractData = rawToData,kwargs...)
-	subjects = unique(dataDF.subject)
+function run_unfold(dataDF, bfDict; eventcolumn="event",removeTimeexpandedXs=true, extract_data = raw_to_data, verbose::Bool=true, kwargs...)
 
-	resultsDF = DataFrame()
+    resultsDF = DataFrame()
 
-	for sub in subjects
+	pbar = ProgressBar(total=size(dataDF, 1))
 
-		# Get current subject
-		raw = @subset(dataDF, :subject .== sub).data
-		
-		tmpEvents = @subset(eventsDF, :subject .== sub)
+    for row in eachrow(dataDF)
 
-		tmpData = extractData(raw[1],tmpEvents;kwargs...)
-		
+		if verbose
+            update(pbar)
+            #@printf("Loading subject %s at:\n %s \n",row.subject, file_path)
+        end
 
-		# Fit Model
-		m = fit(UnfoldModel,bfDict,tmpEvents,tmpData; eventcolumn=eventcolumn);
+        tmpEvents = row.events
 
-		if removeTimeexpandedXs && (m isa UnfoldLinearModelContinuousTime || m isa UnfoldLinearModelContinuousTime)
-			m = typeof(m)(m.design, Unfold.DesignMatrix(designmatrix(m).formulas, missing, designmatrix(m).events), m.modelfit)
-		end
-		results = DataFrame(:subject => sub, :model => m)
-		
-		append!(resultsDF, results)
+        tmpData = extract_data(row.data; kwargs...)
 
 
-	end
-	return resultsDF
+        # Fit Model
+        m = fit(UnfoldModel, bfDict, tmpEvents, tmpData; eventcolumn=eventcolumn)
+
+        if removeTimeexpandedXs && (m isa UnfoldLinearModelContinuousTime || m isa UnfoldLinearModelContinuousTime)
+            m = typeof(m)(m.design, Unfold.DesignMatrix(designmatrix(m).formulas, missing, designmatrix(m).events), m.modelfit)
+        end
+        results = DataFrame(subject = row.subject, ses=row.ses, task=row.task, run=row.run,  model = m)
+
+        append!(resultsDF, results)
+
+
+    end
+    return resultsDF
 end
 
 # Function to run Preprocessing functions on data
-function rawToData(raw,tmpEvents;channels::AbstractVector{<:Union{String, Integer}}=[])
-	return pyconvert(Array,raw.get_data(picks=pylist(channels),units="uV"))
+function raw_to_data(raw; channels::AbstractVector{<:Union{String,Integer}}=[])
+    return pyconvert(Array, raw.get_data(picks=pylist(channels), units="uV"))
 end
 
-# Calculate Grand average; this is likely a TODO
-# Commented this out for now as this might go into UnfoldStats; R.S. 18/01/24
-#=
-function calculateGA(resultsDF; channels=:false)
-	GA = @chain resultsDF begin
-		# TODO: check if this works
-		if channels
-			@subset(:channel .== channels)
-		end
-		# need to check which variables to use
-		@by([:basisname,:coefname,:time, :channel], :estimate = mean(estimate))
+"""
+	unpack_events(df::DataFrame)
+
+Unpack events into tidy data frame; useful with AlgebraOfGraphics.jl
+
+df is expected to be a UnfoldBIDS DataFrame where events are loaded already.
+"""
+
+function unpack_events(df::DataFrame)
+
+	all_events = DataFrame()
+	for row in eachrow(df)
+		tmp_df = row.events
+		tmp_df.subject .= row.subject
+		tmp_df.ses .= row.ses
+		tmp_df.task .= row.task
+		tmp_df.run .= row.run
+		append!(all_events, tmp_df)
+	end
+	# Change collumn order to look nicer
+	select!(all_results, :subject, :ses, :task, :run, Not([:subject, :ses, :task, :run]))
+	return all_events
+end
+
+function bids_coeftable(model_df)
+
+	all_results = DataFrame()
+	for row in eachrow(model_df)
+		tmp_table = coeftable(row.model)
+		tmp_df = DataFrame(subject = row.subject, ses=row.ses, task=row.task, run=row.run,  results = tmp_table)
+		append!(all_results, tmp_df)
 	end
 
-    
+	return all_results
 end
-=#
 
-#=
-# Function to run unfold on epoched data
-function runUnfold(DataDF, EventsDF, formula, sfreq, τ = (-0.3,1.); channels::Union{Nothing, String, Integer}=nothing)
+"""
+	unpack_results(results_df)
 
-	
-	# we have multi channel support
-	# data_r = reshape(data,(1,:))
-	# cut the data into epochs
+Unpack all results into one tidy dataframe/ coeftable.
+"""
+function unpack_results(results_df)
 
-	subjects = unique(DataDF.subject)
-
-	resultsDF = DataFrame()
-
-	for sub in subjects
-
-		# Get current subject
-		raw = @subset(DataDF, :subject .== sub)data
-		if channels == nothing
-			tmpData = pyconvert(Array,raw[1].get_data()).*10^6
-		else
-			tmpData = pyconvert(Array,raw[1].get_data(picks=channels)).*10^6
-		end
-
-		# Get events
-		tmpEvents = @subset(EventsDF, :subject .== sub)
-
-		# Cut data into epochs
-		data_epochs,times = Unfold.epoch(data=tmpData,tbl=tmpEvents,τ=τ,sfreq=sfreq);
-		
-		# Fit Model
-		m = fit(UnfoldModel,formula,tmpEvents,data_epochs,times);
-		results = coeftable(m)
-
-		results.subject .= sub
-		append!(resultsDF, results)
+	all_results = DataFrame()
+	for row in eachrow(results_df)
+		tmp_df = row.results
+		tmp_df.subject .= row.subject
+		tmp_df.ses .= row.ses
+		tmp_df.task .= row.task
+		tmp_df.run .= row.run
+		append!(all_results, tmp_df)
 	end
-	return resultsDF
+	# Change collumn order to look nicer
+	select!(all_results, :subject, :ses, :task, :run, Not([:subject, :ses, :task, :run]))
+
+	return all_results
 end
-=#
+
+"""
+	add_latency_from_df(data_df)
+
+This is a convenience function to add a :latency collumn (needed by Unfold) based on another variable in the events_df (e.g. sample)
+"""
+
+function add_latency_from_df(data_df, symbol::Symbol)
+	for row in eachrow(data_df); row.events.latency = row.events[!,symbol]; end
+end

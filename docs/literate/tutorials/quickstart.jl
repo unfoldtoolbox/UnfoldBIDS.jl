@@ -7,8 +7,9 @@ using UnfoldBIDS
 # To load use UnfoldBIDS to find the paths to all subject specific data you can uye the bidsLayout function:
 
 # ```julia
-# path_to_bids_root = "/store/data/2023EEGManyLabs"
-# layout_df = bidsLayout(path_to_bids_root, derivative=false)
+sample_data = artifact"sample_BIDS"
+bids_path = sample_data * "/Users/ReneS/Desktop/sample_ds/" # This is currently a bit awkward due to a zip issue; will change in the future
+# layout_df = bids_layout(bids_path, derivative=false)
 # ```
 # This will give you a DataFrame containing the paths too the eeg files of all subjects plus their accompanying event files
 
@@ -24,14 +25,14 @@ using UnfoldBIDS
 # !!! note
 #       The data is not actually loaded into memory, but uses MNE's lazy loading functionality.
 
-# Lastly, current functionality only supports explicit loading of the events. In the future this will be done automatically with the previous step.
+# UnfoldBIDS trys to load events directly into the DataFrame, however if you are missing the event tsv files you will get a warning and no events are loaded. If that happens you have to manually load these events. The following function might help you with this.
 
 # ```julia
-# events_df = load_events(layoutDF)
+# events_df = load_events(layout_df)
 # ```
 
 # ## Run unfold type models
 
 # ```julia
-# resultsAll = runUnfold(eeg_df, events_df, bfDict; channels=nothing, eventcolumn="trial_type")
+# resultsAll = run_unfold(eeg_df, events_df, bfDict; channels=nothing, eventcolumn="trial_type")
 # ```
