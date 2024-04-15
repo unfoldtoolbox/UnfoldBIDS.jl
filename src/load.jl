@@ -86,7 +86,7 @@ function get_info!(files_df, file)
 
     # Make regex for parts
     regex_sub = r"sub-(\d+)"
-    regex_ses = r"ses-(.+?)_"
+    regex_ses = r"ses-(\d+)"
     regex_task = r"task-(.+?)_"
     regex_run = r"run-(\d+)"
 
