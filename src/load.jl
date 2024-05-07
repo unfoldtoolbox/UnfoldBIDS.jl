@@ -24,7 +24,7 @@ function bids_layout(bidsPath::AbstractString;
     end
 
     # Choose what to ignore and check if derivatives should be used
-    exclude = [] 
+    exclude = []
     if derivatives
         bidsPath = joinpath(bidsPath, "derivatives")
     else
@@ -44,23 +44,12 @@ function bids_layout(bidsPath::AbstractString;
 
     files_df = DataFrame(subject=[], ses=[], task=[], run=[], file=[])  # Initialize an empty DataFrame to hold results
 
-    list_all_eegpaths(path) = @cont begin
-        if isfile(path)
-            (any(endswith.(path, file_ending)) & all(occursin.(file_pattern, path))) && cont(path)
-        elseif isdir(path)
-            startswith(basename(path), ".") && return # skip all hidden files/ paths
-            if exclude !== nothing
-                basename(path) in (exclude...,) && return
-            end
-            for file in readdir(path)
-                foreach(cont, list_all_eegpaths(joinpath(path, file)))
-            end
-        end
+    all_paths = collect(list_all_paths(abspath(bidsPath), file_ending, file_pattern, exclude=exclude))
+    #all_paths = collect(find_paths(abspath(bidsPath), exclude));
+
+    if isempty(all_paths)
+        throw("No files found at $bidsPath; make sure you have the right path and that your directory is BIDS compatible.")
     end
-
-    all_paths = collect(list_all_eegpaths(abspath(bidsPath)))
-
-    if isempty(all_paths); throw("No files found at $bidsPath; make sure you have the right path and that your directory is BIDS compatible."); end
 
     # Add additional information
     for path in all_paths

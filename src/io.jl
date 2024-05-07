@@ -1,31 +1,130 @@
 # Input/ Output of Unfold results
+"""
+    save_results(results::DataFrame, bids_root::String; 
+        save_folder::String="Unfold",
+        overwrite::Bool=false)
 
+Function to save unfold models in your BIDS root folder. Automatically creates a save_folder (default = "Unfold") in the derivatives and subsequentely safes each model in results according to BIDS.
 
-function save_results(results::DataFrame, bids_root::String; 
+If overwrite is false the function will check for already saved results in the same folder and with the same name i.e. same subject/session/task/run.
+"""
+function save_results(results::DataFrame, bids_root::String;
     save_folder::String="Unfold",
     overwrite::Bool=false)
 
     # Make folder to save in
     save_in = joinpath(bids_root, "derivatives", save_folder)
-    if !isdir(save_in)
+    if !isdir(save_in) && isdir(bids_root)
         mkdir(save_in)
+    elseif !isdir(bids_root)
+        throw("$bids_root does not exists.")
     end
 
     for row in eachrow(results)
-        
+
         # Make folder for subject
-        tmp_folder = joinpath(save_in, row.subject, "eeg")
-        mkdir(tmp_folder)
+        tmp_folder = joinpath(save_in, "sub-" * row.subject, "eeg")
+        mkpath(tmp_folder)
 
         # Make a filename based on available data
         file_name = "sub-" * row.subject
-        if !ismissing(row.ses); file_name = file_name * "ses-" * row.ses; end
-        if !ismissing(row.task); file_name = file_name * "task-" * row.task; end
-        if !ismissing(row.run); file_name = file_name * "run-" * row.run; end
-        file_name = file_name * ".jld2"
-        
-        save(joinpath(tmp_folder, file_name), row.model; compress = true);
+        if !ismissing(row.ses)
+            file_name = file_name * "_ses-" * row.ses
+        end
+        if !ismissing(row.task)
+            file_name = file_name * "_task-" * row.task
+        end
+        if !ismissing(row.run)
+            file_name = file_name * "_run-" * row.run
+        end
+        file_name = file_name * "_eeg.jld2"
 
+        fullfile_path = joinpath(tmp_folder, file_name)
+        if !overwrite && !isfile(fullfile_path)
+            save(fullfile_path, row.model; compress=true)
+        elseif !overwrite && isfile(fullfile_path)
+            @warn("overwrite is set to false and at least one subject has already saved results in the folder $save_in
+            If you're sure you want to overwrite your data, please set overwrite=true   
+            Subject file: $file_name")
+            return
+        else
+            save(fullfile_path, row.model; compress=true)
+        end
     end
 
+end
+
+"""
+    function load_results()
+
+Load Unfold models existing in a BIDS root folder. If lazy is true (default) then data will not be loaded and a DataFrame containing all file names + information will be returned (similar to bids_layout output).
+"""
+function load_results(bids_root::String;
+    save_folder::String="Unfold",
+    lazy::Bool=false,
+    generate_Xs::Bool = true,
+    ses::Union{Nothing,AbstractString}=nothing,
+    task::Union{Nothing,AbstractString}=nothing,
+    run::Union{Nothing,AbstractString}=nothing)
+
+    # Correct path
+    path = joinpath(bids_root, "derivatives", save_folder)
+
+    # Any files with these endings will be returned
+    file_ending = [".jld2"]
+
+    file_pattern = [""]
+    # Extend file pattern
+    if ses !== nothing
+        file_pattern = push!(file_pattern, "ses-" * ses)
+    end
+
+    if task !== nothing
+        file_pattern = push!(file_pattern, "task-" * task)
+    end
+
+    if run !== nothing
+        file_pattern = push!(file_pattern, "run-" * run)
+    end
+
+    all_paths = collect(list_all_paths(abspath(path), file_ending, file_pattern, exclude=nothing))
+
+    if isempty(all_paths)
+        throw("No results files found at $path; make sure you have the right path and that your directory is BIDS compatible.")
+    end
+
+    files_df = DataFrame(subject=[], ses=[], task=[], run=[], file=[])  # Initialize an empty DataFrame to hold results
+
+    # Add additional information
+    for path in all_paths
+        get_info!(files_df, path)
+    end
+
+    # Check for multiple session/tasks/runs
+    check_df(files_df, ses, task, run)
+
+    # Actually load data
+    if !lazy
+        return _load_results(files_df, generate_Xs)
+    else
+        return files_df
+    end
+
+end
+
+"""
+    _load_results(files_df; generate_Xs::Bool = true)
+
+Internal functino to load Unfold models into memory. Can also be used to load data after file information was loaded lazily (lazy=true) using load_results()
+"""
+function _load_results(files_df, generate_Xs::Bool = true)
+
+    results_df = DataFrame()
+    for row in eachrow(files_df)
+        tmp_data = load(row.file, UnfoldModel, generate_Xs = generate_Xs);
+        tmp_df = DataFrame(subject=row.subject, ses=row.ses, task=row.task, run=row.run, data=tmp_data)
+
+        append!(results_df, tmp_df)
+    end
+    return results_df
 end

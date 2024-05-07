@@ -112,3 +112,22 @@ This is a convenience function to add a :latency collumn (needed by Unfold) base
 function add_latency_from_df(data_df, symbol::Symbol)
 	for row in eachrow(data_df); row.events.latency = row.events[!,symbol]; end
 end
+
+"""
+	list_all_paths(path)
+
+Internal functino to find pathfiles
+"""
+list_all_paths(path, file_ending, file_pattern; exclude=nothing) = @cont begin
+	if isfile(path)
+		(any(endswith.(path, file_ending)) & all(occursin.(file_pattern, path))) && cont(path)
+	elseif isdir(path)
+		startswith(basename(path), ".") && return # skip all hidden files/ paths
+		if exclude !== nothing
+			basename(path) in (exclude...,) && return
+		end
+		for file in readdir(path)
+			foreach(cont, list_all_paths(joinpath(path, file), file_ending, file_pattern, exclude=exclude))
+		end
+	end
+end
