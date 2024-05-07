@@ -7,7 +7,7 @@ function bids_layout(bidsPath::AbstractString;
     run::Union{Nothing,AbstractString}=nothing)
 
     # Any files with these endings will be returned
-    file_ending = [".eeg", ".set", ".fif", ".vhdr", ".edf"]
+    file_ending = [".set", ".fif", ".vhdr", ".edf"]
 
     file_pattern = [""]
     # Extend file pattern
@@ -86,7 +86,7 @@ function get_info!(files_df, file)
 
     # Make regex for parts
     regex_sub = r"sub-(\d+)"
-    regex_ses = r"ses-(.+?)_"
+    regex_ses = r"ses-(\d+)"
     regex_task = r"task-(.+?)_"
     regex_run = r"run-(\d+)"
 
