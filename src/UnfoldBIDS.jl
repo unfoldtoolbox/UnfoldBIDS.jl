@@ -23,6 +23,7 @@ export collect_events
 export run_unfold
 export bids_coeftable
 export unpack_events, unpack_results
+export save_results, load_results
 #export epochedFit
 
 import StatsModels.FormulaTerm # for exporting
