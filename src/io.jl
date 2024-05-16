@@ -1,19 +1,20 @@
 # Input/ Output of Unfold results
 """
     save_results(results::DataFrame, bids_root::String; 
-        save_folder::String="Unfold",
+        derivatives_subfolder::String="Unfold",
         overwrite::Bool=false)
 
-Function to save unfold models in your BIDS root folder. Automatically creates a save_folder (default = "Unfold") in the derivatives and subsequentely safes each model in results according to BIDS.
+Function to save unfold models in your BIDS root folder. Automatically creates a derivatives_subfolder (default = "Unfold") in the derivatives and subsequentely safes each model in results according to BIDS.
+Example of path so saved file: bids_root/derivatives/Unfold/sub-XXX/eeg/sub-XXX_ses-XX_task-XXX_run-XX_unfold.jld2
 
 If overwrite is false the function will check for already saved results in the same folder and with the same name i.e. same subject/session/task/run.
 """
 function save_results(results::DataFrame, bids_root::String;
-    save_folder::String="Unfold",
+    derivatives_subfolder::String="Unfold",
     overwrite::Bool=false)
 
     # Make folder to save in
-    save_in = joinpath(bids_root, "derivatives", save_folder)
+    save_in = joinpath(bids_root, "derivatives", derivatives_subfolder)
     if !isdir(save_in) && isdir(bids_root)
         mkdir(save_in)
     elseif !isdir(bids_root)
@@ -37,7 +38,7 @@ function save_results(results::DataFrame, bids_root::String;
         if !ismissing(row.run)
             file_name = file_name * "_run-" * row.run
         end
-        file_name = file_name * "_eeg.jld2"
+        file_name = file_name * "_unfold.jld2"
 
         fullfile_path = joinpath(tmp_folder, file_name)
         if !overwrite && !isfile(fullfile_path)
@@ -55,12 +56,19 @@ function save_results(results::DataFrame, bids_root::String;
 end
 
 """
-    function load_results()
+    function load_results(bids_root::String;
+        derivatives_subfolder::String="Unfold",
+        lazy::Bool=false,
+        generate_Xs::Bool = true,
+        ses::Union{Nothing,AbstractString}=nothing,
+        task::Union{Nothing,AbstractString}=nothing,
+        run::Union{Nothing,AbstractString}=nothing)
 
-Load Unfold models existing in a BIDS root folder. If lazy is true (default) then data will not be loaded and a DataFrame containing all file names + information will be returned (similar to bids_layout output).
+Load Unfold models existing in a derivatives_subfolder in your BIDS root folder. If lazy is true (default) then data will not be loaded and a DataFrame containing all file paths + information will be returned (similar to bids_layout output).
+generate_Xs reconstructs the designmatrix, can be set to false for faster loading times.
 """
 function load_results(bids_root::String;
-    save_folder::String="Unfold",
+    derivatives_subfolder::String="Unfold",
     lazy::Bool=false,
     generate_Xs::Bool = true,
     ses::Union{Nothing,AbstractString}=nothing,
@@ -68,7 +76,7 @@ function load_results(bids_root::String;
     run::Union{Nothing,AbstractString}=nothing)
 
     # Correct path
-    path = joinpath(bids_root, "derivatives", save_folder)
+    path = joinpath(bids_root, "derivatives", derivatives_subfolder)
 
     # Any files with these endings will be returned
     file_ending = [".jld2"]
