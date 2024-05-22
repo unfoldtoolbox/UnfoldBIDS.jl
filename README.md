@@ -42,39 +42,35 @@ AppStore -> JuliaUp,  or `winget install julia -s msstore` in CMD
 
 ```julia
 using Pkg
-Pkg.add("https://github.com/unfoldtoolbox/UnfoldBIDS.jl")
+Pkg.add("UnfoldBIDS")
 ```
 
-> **Note:** The package is currently not registered. Once it is registered the above add command will change to ```Pkg.add("UnfoldBIDS")```
-
-## Current Functionality
+## Quickstart
 
 ```julia
 using UnfoldBIDS
 
 
 # To look up the paths of all subjects and store in a Dataframe:
-layout_df = bidsLayout(bidsPath::AbstractString; # Path to BIDS root folder
-                     derivative::Bool=true, # Do you want to us the derivative/ processed data? Default = true
-                     specificFolder::Union{Nothing,AbstractString}=nothing, # If you want a specific folder in derivatives or root specify here
-                     excludeFolder::Union{Nothing,AbstractString}=nothing, # You can exclude specific folders when not looking for a specific sub-folder 
-                     task::Union{Nothing,AbstractString}=nothing, # Specify task; will load all tasks if not specified
-                     run::Union{Nothing,AbstractString}=nothing) # Specify run; will load all runs if not specified
-           
+layout_df = bids_layout(bidsPath::AbstractString; # Path to BIDS root folder
+                        derivatives::Bool=true, # Do you want to us the derivative/ processed data? Default = true
+                        specificFolder::Union{Nothing,AbstractString}=nothing, # If you want a specific folder in derivatives or root specify here
+                        excludeFolder::Union{Nothing,AbstractString}=nothing, # You can exclude specific folders when not looking for a specific sub-folder 
+                        ses::Union{Nothing,AbstractString}=nothing, # Specify session; will load all sessions if not specified
+                        task::Union{Nothing,AbstractString}=nothing, # Specify task; will load all tasks if not specified
+                        run::Union{Nothing,AbstractString}=nothing) # Specify run; will load all runs if not specified
+
 # To load all data into memory/ one dataframe:           
-eeg_df = load_bids_eeg_data(layout_df::DataFrame)
-
-3×2 DataFrame
- Row │ subject    data                              
-     │ SubStrin…  Py                                
-─────┼──────────────────────────────────────────────
-   1 │ 005        <RawEEGLAB | sub-005_ses-001_tas…
-   2 │ 006        <RawEEGLAB | sub-006_ses-001_tas…
-   3 │ 007        <RawEEGLAB | sub-007_ses-001_tas…
-
+eeg_df = load_bids_eeg_data(layout_df; verbose::Bool=true, kwargs...)
 
 # To run Unfold model:
-resultsAll = runUnfold(dataDF, eventsDF, bfDict; channels::Union{Nothing, String, Integer}=nothing, eventcolumn="event")
+models_df = run_unfold(dataDF, bfDict; eventcolumn="event",removeTimeexpandedXs=true, extract_data = raw_to_data, verbose::Bool=true, kwargs...)
+
+# For dataframe containing tidy results
+results_df = bids_coeftable(models_df)
+
+# To unpack results into one big tidy DataFrame, with subject information
+results = unpack_results(results_df)
 
 ```
 
