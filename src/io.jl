@@ -7,7 +7,9 @@
 Function to save unfold models in your BIDS root folder. Automatically creates a derivatives_subfolder (default = "Unfold") in the derivatives and subsequentely safes each model in results according to BIDS.
 Example of path so saved file: bids_root/derivatives/Unfold/sub-XXX/eeg/sub-XXX_ses-XX_task-XXX_run-XX_unfold.jld2
 
-If overwrite is false the function will check for already saved results in the same folder and with the same name i.e. same subject/session/task/run.
+# Keywords
+derivatives_subfolder (String::"Unfold"): Creates the named subfolder and saves Unfold models according to BIDS.
+overwrite (Bool::false): Does not overwrite existing datasets; can be set to true.
 """
 function save_results(results::DataFrame, bids_root::String;
     derivatives_subfolder::String="Unfold",
@@ -64,8 +66,16 @@ end
         task::Union{Nothing,AbstractString}=nothing,
         run::Union{Nothing,AbstractString}=nothing)
 
-Load Unfold models existing in a derivatives_subfolder in your BIDS root folder. If lazy is true (default) then data will not be loaded and a DataFrame containing all file paths + information will be returned (similar to bids_layout output).
-generate_Xs reconstructs the designmatrix, can be set to false for faster loading times.
+Load Unfold models existing in a derivatives_subfolder in your BIDS root folder. 
+
+# Keywords
+derivatives_subfolder (String::"Unfold"): Defines in which subfolder of bids_root/derivatives to look for Unfold models.
+lazy (Bool::false): Do not actually load the dataset into memore if true, only return a dataframe with paths
+generate_Xs (Bool::true): Do not recreate the designmatrix; improves loading time.
+ses (Union{Nothing,AbstractString}::nothing): Which session to load; loads all if nothing
+task (Union{Nothing,AbstractString}::nothing): Which task to load; loads all if nothing
+run (Union{Nothing,AbstractString}::nothing): Which run to load; loads all if nothing
+
 """
 function load_results(bids_root::String;
     derivatives_subfolder::String="Unfold",
@@ -123,7 +133,7 @@ end
 """
     _load_results(files_df; generate_Xs::Bool = true)
 
-Internal functino to load Unfold models into memory. Can also be used to load data after file information was loaded lazily (lazy=true) using load_results()
+Internal function to load Unfold models into memory. Can also be used to load data after file information was loaded lazily (lazy=true) using load_results()
 """
 function _load_results(files_df, generate_Xs::Bool = true)
 

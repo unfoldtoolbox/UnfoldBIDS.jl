@@ -1,3 +1,23 @@
+"""
+    bids_layout(bidsPath::AbstractString;
+        derivatives::Bool=true,
+        specificFolder::Union{Nothing,AbstractString}=nothing,
+        excludeFolder::Union{Nothing,AbstractString}=nothing,
+        ses::Union{Nothing,AbstractString}=nothing,
+        task::Union{Nothing,AbstractString}=nothing,
+        run::Union{Nothing,AbstractString}=nothing)
+
+Main function to load paths of all subjects in one bids_root folder. Will return a DataFrame containing all found paths with specific subject information. Used before loading data into memore using @Ref(`load_bids_eeg_data`)
+
+# Keywords
+derivatives (Bool::true): Look for data in the derivatives folder
+specificFolder (Union{Nothing,AbstractString}::nothing): Specify a specific folder name in either derivatives or bids_root to look for data.
+excludeFolder (Union{Nothing,AbstractString}::nothing): Exclude a specific folder from data detection.
+ses (Union{Nothing,AbstractString}::nothing): Which session to load; loads all if nothing
+task (Union{Nothing,AbstractString}::nothing): Which task to load; loads all if nothing
+run (Union{Nothing,AbstractString}::nothing): Which run to load; loads all if nothing
+"""
+
 function bids_layout(bidsPath::AbstractString;
     derivatives::Bool=true,
     specificFolder::Union{Nothing,AbstractString}=nothing,
@@ -69,7 +89,12 @@ function bids_layout(bidsPath::AbstractString;
     return files_df
 end
 
-#
+"""
+    get_info!(files_df, file)
+
+Internal function to get subject information from dataframe.
+"""
+
 # get subject and file information
 function get_info!(files_df, file)
 
@@ -114,6 +139,15 @@ function check_df(files_df, ses, task, run)
 end
 #-----------------------------------------------------------------------------------------------
 # Function loading BIDS data given bidsLayout DataFrame
+"""
+    load_bids_eeg_data(layout_df; verbose::Bool=true, kwargs...)
+
+Load data found with @Ref('bids_layout') into memory.
+
+verbose (Bool::true): Show ProgressBar
+kwargs... : kwargs for CSV.read to load events from .tsv file; e.g. to specify delimeter
+"""
+
 function load_bids_eeg_data(layout_df; verbose::Bool=true, kwargs...)
 
     # Initialize an empty dataframe
@@ -219,6 +253,12 @@ end
 #-----------------------------------------------------------------------------------------------
 
 # Function to find and load all events files into a DataFrame
+
+"""
+load_events(layoutDF::DataFrame; kwargs...)
+
+Internal function to load events based on paths in the layout Df
+"""
 
 function load_events(layoutDF::DataFrame; kwargs...)
 
