@@ -1,3 +1,23 @@
+"""
+    bids_layout(bidsPath::AbstractString;
+        derivatives::Bool=true,
+        specificFolder::Union{Nothing,AbstractString}=nothing,
+        excludeFolder::Union{Nothing,AbstractString}=nothing,
+        ses::Union{Nothing,AbstractString}=nothing,
+        task::Union{Nothing,AbstractString}=nothing,
+        run::Union{Nothing,AbstractString}=nothing)
+
+Main function to load paths of all subjects in one bids_root folder. Will return a DataFrame containing all found paths with specific subject information. Used before loading data into memore using @Ref(`load_bids_eeg_data`)
+
+# Keywords
+derivatives (Bool::true): Look for data in the derivatives folder
+specificFolder (Union{Nothing,AbstractString}::nothing): Specify a specific folder name in either derivatives or bids_root to look for data.
+excludeFolder (Union{Nothing,AbstractString}::nothing): Exclude a specific folder from data detection.
+ses (Union{Nothing,AbstractString}::nothing): Which session to load; loads all if nothing
+task (Union{Nothing,AbstractString}::nothing): Which task to load; loads all if nothing
+run (Union{Nothing,AbstractString}::nothing): Which run to load; loads all if nothing
+"""
+
 function bids_layout(bidsPath::AbstractString;
     derivatives::Bool=true,
     specificFolder::Union{Nothing,AbstractString}=nothing,
@@ -24,7 +44,7 @@ function bids_layout(bidsPath::AbstractString;
     end
 
     # Choose what to ignore and check if derivatives should be used
-    exclude = [] 
+    exclude = []
     if derivatives
         bidsPath = joinpath(bidsPath, "derivatives")
     else
@@ -44,23 +64,12 @@ function bids_layout(bidsPath::AbstractString;
 
     files_df = DataFrame(subject=[], ses=[], task=[], run=[], file=[])  # Initialize an empty DataFrame to hold results
 
-    list_all_eegpaths(path) = @cont begin
-        if isfile(path)
-            (any(endswith.(path, file_ending)) & all(occursin.(file_pattern, path))) && cont(path)
-        elseif isdir(path)
-            startswith(basename(path), ".") && return # skip all hidden files/ paths
-            if exclude !== nothing
-                basename(path) in (exclude...,) && return
-            end
-            for file in readdir(path)
-                foreach(cont, list_all_eegpaths(joinpath(path, file)))
-            end
-        end
+    all_paths = collect(list_all_paths(abspath(bidsPath), file_ending, file_pattern, exclude=exclude))
+    #all_paths = collect(find_paths(abspath(bidsPath), exclude));
+
+    if isempty(all_paths)
+        throw("No files found at $bidsPath; make sure you have the right path and that your directory is BIDS compatible.")
     end
-
-    all_paths = collect(list_all_eegpaths(abspath(bidsPath)))
-
-    if isempty(all_paths); throw("No files found at $bidsPath; make sure you have the right path and that your directory is BIDS compatible."); end
 
     # Add additional information
     for path in all_paths
@@ -80,7 +89,12 @@ function bids_layout(bidsPath::AbstractString;
     return files_df
 end
 
-#
+"""
+    get_info!(files_df, file)
+
+Internal function to get subject information from dataframe.
+"""
+
 # get subject and file information
 function get_info!(files_df, file)
 
@@ -125,6 +139,15 @@ function check_df(files_df, ses, task, run)
 end
 #-----------------------------------------------------------------------------------------------
 # Function loading BIDS data given bidsLayout DataFrame
+"""
+    load_bids_eeg_data(layout_df; verbose::Bool=true, kwargs...)
+
+Load data found with @Ref('bids_layout') into memory.
+
+verbose (Bool::true): Show ProgressBar
+kwargs... : kwargs for CSV.read to load events from .tsv file; e.g. to specify delimeter
+"""
+
 function load_bids_eeg_data(layout_df; verbose::Bool=true, kwargs...)
 
     # Initialize an empty dataframe
@@ -230,6 +253,12 @@ end
 #-----------------------------------------------------------------------------------------------
 
 # Function to find and load all events files into a DataFrame
+
+"""
+load_events(layoutDF::DataFrame; kwargs...)
+
+Internal function to load events based on paths in the layout Df
+"""
 
 function load_events(layoutDF::DataFrame; kwargs...)
 
