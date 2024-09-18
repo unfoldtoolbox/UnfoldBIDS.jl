@@ -111,7 +111,6 @@ end
 @testset "UnfoldBIDS.check_df tests" begin
     # Test 1: Multiple sessions, should trigger a warning
     files_df = DataFrame(ses = ["ses1", "ses2"], task = ["task1", "task1"], run = ["run1", "run1"])
-	@show files_df
     @test_logs (:warn,) begin
     	  UnfoldBIDS.check_df(files_df, nothing, "task1", "run1")
     end
