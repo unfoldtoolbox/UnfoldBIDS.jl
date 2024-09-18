@@ -1,7 +1,10 @@
 using UnfoldBIDS
 using Test
 using DataFrames
+using Logging
 
+
+###
 @testset "UnfoldBIDS.get_info!" begin
     # Write your tests here.
 
@@ -37,4 +40,109 @@ using DataFrames
     file6 = "no_pattern_here.vhdr"
     files_df = UnfoldBIDS.get_info!(files_df, file6)
     @test isequal(files_df[6, :], DataFrame(Sub = missing, Ses = missing, Task = missing, Run = missing, File = file6)[1,:])
+end
+
+### Find paths
+
+# Create a temporary directory and files for testing
+function setup_temp_directory()
+    temp_dir = mktempdir()
+
+    # Create some files with different patterns and endings
+    open(joinpath(temp_dir, "file1.txt"), "w") do f
+        write(f, "Sample text file 1")
+    end
+    open(joinpath(temp_dir, "file2.log"), "w") do f
+        write(f, "Log file content")
+    end
+    open(joinpath(temp_dir, ".hidden.txt"), "w") do f
+       write(f, "Hidden file content")
+    end
+
+    # Create a subdirectory
+    sub_dir = joinpath(temp_dir, "subdir")
+    mkdir(sub_dir)
+    open(joinpath(sub_dir, "file3.txt"), "w") do f
+        write(f, "Sample text file 3")
+    end
+
+    # Create a hidden directory with files
+    hidden_dir = joinpath(temp_dir, ".hidden_subdir")
+    mkdir(hidden_dir)
+    open(joinpath(hidden_dir, "file4.txt"), "w") do f
+        write(f, "This file should be ignored")
+    end
+
+    return temp_dir
+end
+
+@testset "UnfoldBIDS.list_all_paths tests" begin
+    # Setup
+    temp_dir = setup_temp_directory()
+
+    # Test 1: Simple file ending and pattern match
+    result = collect(UnfoldBIDS.list_all_paths(temp_dir, ".txt", "file1"))
+	@test length(result) == 1
+    @test result[1] == joinpath(temp_dir, "file1.txt")
+
+    # Test 2: Directory traversal with file ending ".txt"
+    result = collect(UnfoldBIDS.list_all_paths(temp_dir, ".txt", ""))
+	@test length(result) == 2 # file1.txt and subdir/file3.txt
+    @test joinpath(temp_dir, "file1.txt") in result
+    @test joinpath(temp_dir, "subdir", "file3.txt") in result
+
+    # Test 3: Hidden files/directories should be ignored
+    result = collect(UnfoldBIDS.list_all_paths(temp_dir, ".txt", ""; exclude=nothing))
+	@test length(result) == 2 # should not include hidden files
+
+    # Test 4: Exclude certain directories
+    result = collect(UnfoldBIDS.list_all_paths(temp_dir, ".txt", ""; exclude=["subdir"]))
+	@test length(result) == 1 # Only file1.txt should be listed, subdir excluded
+    @test joinpath(temp_dir, "file1.txt") in result
+
+    # Test 5: No matches
+    result = collect(UnfoldBIDS.list_all_paths(temp_dir, ".md", ""))
+	 @test length(result) == 0 # No markdown files present
+end
+
+### UnfoldBIDS.check_df
+
+# Test cases
+@testset "UnfoldBIDS.check_df tests" begin
+    # Test 1: Multiple sessions, should trigger a warning
+    files_df = DataFrame(ses = ["ses1", "ses2"], task = ["task1", "task1"], run = ["run1", "run1"])
+	@show files_df
+    @test_logs (:warn,) begin
+    	  UnfoldBIDS.check_df(files_df, nothing, "task1", "run1")
+    end
+    
+    # Test 2: No session provided but only one unique session, should not trigger a warning
+    files_df = DataFrame(ses = ["ses1"], task = ["task1"], run = ["run1"])
+    @test_logs begin
+        UnfoldBIDS.check_df(files_df, nothing, "task1", "run1")
+    end
+
+    # Test 3: Multiple tasks, should trigger a warning
+    files_df = DataFrame(ses = ["ses1", "ses1"], task = ["task1", "task2"], run = ["run1", "run1"])
+    @test_logs (:warn,) begin
+        UnfoldBIDS.check_df(files_df, "ses1", nothing, "run1")
+    end
+
+    # Test 4: Multiple runs, should trigger a warning
+    files_df = DataFrame(ses = ["ses1", "ses1"], task = ["task1", "task1"], run = ["run1", "run2"])
+    @test_logs (:warn,) begin
+        UnfoldBIDS.check_df(files_df, "ses1", "task1", nothing)
+    end
+
+    # Test 5: No warning when ses, task, and run are provided and have single unique values
+    files_df = DataFrame(ses = ["ses1", "ses1"], task = ["task1", "task1"], run = ["run1", "run1"])
+    @test_logs begin
+        UnfoldBIDS.check_df(files_df, "ses1", "task1", "run1")
+    end
+    
+    # Test 6: Handling missing values in ses, task, and run fields (no warnings)
+    files_df = DataFrame(ses = [missing, missing], task = [missing, missing], run = [missing, missing])
+    @test_logs begin
+        UnfoldBIDS.check_df(files_df, nothing, nothing, nothing)
+    end
 end

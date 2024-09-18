@@ -141,9 +141,10 @@ Internal function to find pathfiles
 """
 list_all_paths(path, file_ending, file_pattern; exclude=nothing) = @cont begin
 	if isfile(path)
+		startswith(basename(path), ".") && return # skip all hidden files
 		(any(endswith.(path, file_ending)) & all(occursin.(file_pattern, path))) && cont(path)
 	elseif isdir(path)
-		startswith(basename(path), ".") && return # skip all hidden files/ paths
+		startswith(basename(path), ".") && return # skip all hidden paths
 		if exclude !== nothing
 			basename(path) in (exclude...,) && return
 		end
