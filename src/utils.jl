@@ -9,12 +9,15 @@
 Run Unfold analysis on all data in dataDF.
 
 # Keywords
+
 eventcolumn (String::"event"): Which collumn Unfold should use during the analysis.
+
 removeTimeexpandedXs (Bool::true): Removes the timeexpanded designmatrix which significantly reduces the memory-consumption. This Xs is rarely needed, but can be recovered (look into the Unfold.load function)
+
 extractData (functionraw_to_data): Specify the function that translate the MNE Raw object to an data array. Default is `rawToData` which uses get_data and allows to pick `channels` - see @Ref(`raw_to_data`). The optional kw- arguments (e.g. channels) need to be specified directly in the `run_unfold` function as kw-args
+
 verbose (Bool::true): Show ProgressBar or not.
 """
-
 function run_unfold(dataDF, bfDict; eventcolumn="event",removeTimeexpandedXs=true, extract_data = raw_to_data, verbose::Bool=true, kwargs...)
 
     resultsDF = DataFrame()
@@ -54,8 +57,6 @@ end
 
 Function to get data from MNE raw object. Can choose specific channels; default loads all channels.
 """
-
-# Function to run Preprocessing functions on data
 function raw_to_data(raw; channels::AbstractVector{<:Union{String,Integer}}=[])
     return pyconvert(Array, raw.get_data(picks=pylist(channels), units="uV"))
 end
@@ -67,7 +68,6 @@ Unpack events into tidy data frame; useful with AlgebraOfGraphics.jl
 
 df is expected to be a UnfoldBIDS DataFrame where events are loaded already.
 """
-
 function unpack_events(df::DataFrame)
 
 	all_events = DataFrame()
@@ -89,7 +89,6 @@ end
 
 Turns all models found in model_df into tydy DataFrames and aggregates them in a new DataFrame.
 """
-
 function bids_coeftable(model_df)
 
 	all_results = DataFrame()
@@ -129,7 +128,6 @@ end
 
 This is a convenience function to add a :latency collumn (needed by Unfold) based on another variable in the events_df (e.g. sample)
 """
-
 function add_latency_from_df(data_df, symbol::Symbol)
 	for row in eachrow(data_df); row.events.latency = row.events[!,symbol]; end
 end

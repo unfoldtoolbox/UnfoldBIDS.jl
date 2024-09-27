@@ -35,13 +35,12 @@ makedocs(;
             "Quickstart" => "generated/tutorials/quickstart.md",
         ],
         "Reference" => [
-            "Overview: Toolbox Functions" => "./generated/reference/overview.md",
+            "API: Toolbox Functions" => "api.md",
             "Brain Imaging Data Structure" => "./generated/reference/BIDS.md"
         ],
         "HowTo" => [
             "Apply preprocessing functions" => "./generated/HowTo/ApplyPreprocessing.md",
         ],
-        "DocStrings" => "api.md",
     ],
 )
 

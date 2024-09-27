@@ -8,7 +8,9 @@ Function to save unfold models in your BIDS root folder. Automatically creates a
 Example of path so saved file: bids_root/derivatives/Unfold/sub-XXX/eeg/sub-XXX_ses-XX_task-XXX_run-XX_unfold.jld2
 
 # Keywords
+
 derivatives_subfolder (String::"Unfold"): Creates the named subfolder and saves Unfold models according to BIDS.
+
 overwrite (Bool::false): Does not overwrite existing datasets; can be set to true.
 """
 function save_results(results::DataFrame, bids_root::String;
@@ -58,7 +60,7 @@ function save_results(results::DataFrame, bids_root::String;
 end
 
 """
-    function load_results(bids_root::String;
+    load_results(bids_root::String;
         derivatives_subfolder::String="Unfold",
         lazy::Bool=false,
         generate_Xs::Bool = true,
@@ -70,10 +72,15 @@ Load Unfold models existing in a derivatives_subfolder in your BIDS root folder.
 
 # Keywords
 derivatives_subfolder (String::"Unfold"): Defines in which subfolder of bids_root/derivatives to look for Unfold models.
+
 lazy (Bool::false): Do not actually load the dataset into memore if true, only return a dataframe with paths
+
 generate_Xs (Bool::true): Do not recreate the designmatrix; improves loading time.
+
 ses (Union{Nothing,AbstractString}::nothing): Which session to load; loads all if nothing
+
 task (Union{Nothing,AbstractString}::nothing): Which task to load; loads all if nothing
+
 run (Union{Nothing,AbstractString}::nothing): Which run to load; loads all if nothing
 
 """
