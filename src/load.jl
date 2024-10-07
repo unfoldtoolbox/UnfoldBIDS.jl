@@ -1,8 +1,8 @@
 """
     bids_layout(bidsPath::AbstractString;
         derivatives::Bool=true,
-        specificFolder::Union{Nothing,AbstractString}=nothing,
-        excludeFolder::Union{Nothing,AbstractString}=nothing,
+        specific_folder::Union{Nothing,AbstractString}=nothing,
+        exclude_folder::Union{Nothing,AbstractString}=nothing,
         ses::Union{Nothing,AbstractString}=nothing,
         task::Union{Nothing,AbstractString}=nothing,
         run::Union{Nothing,AbstractString}=nothing)
@@ -12,9 +12,9 @@ Main function to load paths of all subjects in one bids_root folder. Will return
 ## Keywords
 - `derivatives::Bool = true`\\
    Look for data in the derivatives folder
-- `specificFolder::Union{Nothing,AbstractString} = nothing`\\
+- `specific_folder::Union{Nothing,AbstractString} = nothing`\\
    Specify a specific folder name in either derivatives or bids_root to look for data.
-- `excludeFolder::Union{Nothing,AbstractString} = nothing`\\
+- `exclude_folder::Union{Nothing,AbstractString} = nothing`\\
    Exclude a specific folder from data detection.
 - `ses:Union{Nothing,AbstractString} = nothing`\\
    Which session to load; loads all if nothing
@@ -25,8 +25,8 @@ Main function to load paths of all subjects in one bids_root folder. Will return
 """
 function bids_layout(bidsPath::AbstractString;
     derivatives::Bool=true,
-    specificFolder::Union{Nothing,AbstractString}=nothing,
-    excludeFolder::Union{Nothing,AbstractString}=nothing,
+    specific_folder::Union{Nothing,AbstractString}=nothing,
+    exclude_folder::Union{Nothing,AbstractString}=nothing,
     ses::Union{Nothing,AbstractString}=nothing,
     task::Union{Nothing,AbstractString}=nothing,
     run::Union{Nothing,AbstractString}=nothing)
@@ -56,13 +56,13 @@ function bids_layout(bidsPath::AbstractString;
         push!(exclude, "derivatives")
     end
 
-    if excludeFolder !== nothing
-        exclude = push!(exclude, excludeFolder)
+    if exclude_folder !== nothing
+        exclude = push!(exclude, exclude_folder)
     end
 
     # Choose a specific folder in either ./ or ./derivatives
-    if specificFolder !== nothing
-        bidsPath = joinpath(bidsPath, specificFolder)
+    if specific_folder !== nothing
+        bidsPath = joinpath(bidsPath, specific_folder)
     end
 
 
@@ -78,7 +78,7 @@ function bids_layout(bidsPath::AbstractString;
 
     # Add additional information
     for path in all_paths
-        get_info!(files_df, path)
+        extract_subject_id!(files_df, path)
     end
 
     # Check for multiple session/tasks/runs
@@ -95,11 +95,11 @@ function bids_layout(bidsPath::AbstractString;
 end
 
 """
-    get_info!(files_df, file)
+    extract_subject_id!(files_df, file)
 
 Internal function to get subject information from dataframe.
 """
- function get_info!(files_df, file)
+ function extract_subject_id!(files_df, file)
 
     # Make regex for parts
     regex_sub = r"sub-(\d+)"
