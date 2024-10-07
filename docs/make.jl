@@ -44,4 +44,7 @@ makedocs(;
     ],
 )
 
-deploydocs(; repo = "github.com/unfoldtoolbox/UnfoldBIDS.jl", devbranch = "main")
+deploydocs(; 
+    repo = "github.com/unfoldtoolbox/UnfoldBIDS.jl",
+    push_preview = true,
+    devbranch = "main")
