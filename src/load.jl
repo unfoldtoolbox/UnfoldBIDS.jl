@@ -9,18 +9,19 @@
 
 Main function to load paths of all subjects in one bids_root folder. Will return a DataFrame containing all found paths with specific subject information. Used before loading data into memore using @Ref(`load_bids_eeg_data`)
 
-# Keywords
-derivatives (Bool::true): Look for data in the derivatives folder
-
-specificFolder (Union{Nothing,AbstractString}::nothing): Specify a specific folder name in either derivatives or bids_root to look for data.
-
-excludeFolder (Union{Nothing,AbstractString}::nothing): Exclude a specific folder from data detection.
-
-ses (Union{Nothing,AbstractString}::nothing): Which session to load; loads all if nothing
-
-task (Union{Nothing,AbstractString}::nothing): Which task to load; loads all if nothing
-
-run (Union{Nothing,AbstractString}::nothing): Which run to load; loads all if nothing
+## Keywords
+- `derivatives::Bool = true`\\
+   Look for data in the derivatives folder
+- `specificFolder::Union{Nothing,AbstractString} = nothing`\\
+   Specify a specific folder name in either derivatives or bids_root to look for data.
+- `excludeFolder::Union{Nothing,AbstractString} = nothing`\\
+   Exclude a specific folder from data detection.
+- `ses:Union{Nothing,AbstractString} = nothing`\\
+   Which session to load; loads all if nothing
+- `task::Union{Nothing,AbstractString} = nothing`\\
+   Which task to load; loads all if nothing
+- `run::Union{Nothing,AbstractString} = nothing`\\
+   Which run to load; loads all if nothing
 """
 function bids_layout(bidsPath::AbstractString;
     derivatives::Bool=true,
@@ -145,9 +146,10 @@ end
 
 Load data found with @Ref('bids_layout') into memory.
 
-verbose (Bool::true): Show ProgressBar
-
-kwargs... : kwargs for CSV.read to load events from .tsv file; e.g. to specify delimeter
+- `verbose::Bool = true`\\
+   Show ProgressBar
+- `kwargs...`\\
+   kwargs for CSV.read to load events from .tsv file; e.g. to specify delimeter
 """
 function load_bids_eeg_data(layout_df; verbose::Bool=true, kwargs...)
 
