@@ -23,7 +23,7 @@ using UnfoldBIDS
 # ```
 #
 # !!! note
-#       The data is not actually loaded into memory, but uses MNE's lazy loading functionality.
+#       At this point in time, the data is not yet actually loaded into memory, but uses MNE's lazy loading functionality.
 
 # UnfoldBIDS trys to load events directly into the DataFrame, however if you are missing the event tsv files you will get a warning and no events are loaded. If that happens you have to manually load these events. The following function might help you with this. (The resulting dataframe still needs to be added to data_df!)
 
