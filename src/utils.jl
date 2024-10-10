@@ -1,7 +1,7 @@
 """
 	run_unfold(dataDF, bfDict; 
 		eventcolumn="event",
-		removeTimeexpandedXs=true, 
+		remove_time_expanded_Xs=true, 
 		extract_data = raw_to_data, 
 		verbose::Bool=true, 
 		kwargs...)
@@ -12,14 +12,14 @@ Run Unfold analysis on all data in dataDF.
 
 - `eventcolumn::String = "event"`\\
    Which collumn Unfold should use during the analysis.
-- `removeTimeexpandedXs::Bool = true`\\
+- `remove_time_expanded_Xs::Bool = true`\\
    Removes the timeexpanded designmatrix which significantly reduces the memory-consumption. This Xs is rarely needed, but can be recovered (look into the Unfold.load function)
 - `extract_data::function = raw_to_data`\\
    Specify the function that translate the MNE Raw object to an data array. Default is `raw_to_data` which uses `get_data` and allows to pick `channels` - see @Ref(`raw_to_data`). The optional kw- arguments (e.g. channels) need to be specified directly in the `run_unfold` function as kw-args
 - `verbose::Bool = true)`\\
    Show ProgressBar or not.
 """
-function run_unfold(dataDF, bfDict; eventcolumn="event",removeTimeexpandedXs=true, extract_data::Function = raw_to_data, verbose::Bool=true, kwargs...)
+function run_unfold(dataDF, bfDict; eventcolumn="event",remove_time_expanded_Xs=true, extract_data::Function = raw_to_data, verbose::Bool=true, kwargs...)
 
     resultsDF = DataFrame()
 
@@ -41,7 +41,7 @@ function run_unfold(dataDF, bfDict; eventcolumn="event",removeTimeexpandedXs=tru
         m = fit(UnfoldModel, bfDict, tmpEvents, tmpData; eventcolumn=eventcolumn)
 
 		
-        if removeTimeexpandedXs && (m isa UnfoldLinearModel || m isa UnfoldLinearModelContinuousTime)
+        if remove_time_expanded_Xs && (m isa UnfoldLinearModel || m isa UnfoldLinearModelContinuousTime)
             #m = typeof(m)(m.design, Unfold.DesignMatrix(designmatrix(m).formulas, missing, designmatrix(m).events), m.modelfit)
             m.designmatrix = [
                     typeof(m.designmatrix[k])(

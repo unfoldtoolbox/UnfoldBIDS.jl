@@ -1,0 +1,7 @@
+[sample_BIDS]
+git-tree-sha1 = "6fa05e5d4476b16de1d27962bf672c119fa05c87"
+lazy = true
+
+    [[sample_BIDS.download]]
+    sha256 = "998a1f875331cb45a61bab4475f752022581ef4569e69d22934b5cedbae4931f"
+    url = "https://osf.io/download/zarwp/"
