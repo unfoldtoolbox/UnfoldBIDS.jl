@@ -2,6 +2,7 @@
 
 using UnfoldBIDS
 using Unfold
+using LazyArtifacts
 using Main: @artifact_str # this is a workaround for Artifacts used in docs; locally you would `using LazyArtifacts`
 
 # ## Loading data

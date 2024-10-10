@@ -1,8 +1,8 @@
-using UnfoldBIDS
+using Unfold, UnfoldBIDS
+using LazyArtifacts
 using Test
 using DataFrames
 using Logging
-
 
 ###
 @testset "UnfoldBIDS.extract_subject_id!" begin
@@ -143,5 +143,24 @@ end
     files_df = DataFrame(ses = [missing, missing], task = [missing, missing], run = [missing, missing])
     @test_logs begin
         UnfoldBIDS.check_df(files_df, nothing, nothing, nothing)
+    end
+end
+
+
+## Test run_unfold
+# This only tests if unold runs without error/ warning
+@testset "UnfoldBIDS.run_unfold tests" begin
+    data_path = artifact"sample_BIDS"
+    layout = bids_layout(data_path, derivatives=false)
+
+    data_df = load_bids_eeg_data(layout)
+
+    basisfunction = firbasis(τ=(-0.2,.8),sfreq=1024)
+    f  = @formula 0~1
+    bfDict = ["stimulus"=>(f,basisfunction)]
+    UnfoldBIDS.add_latency_from_df(data_df, :sample) # add :latency collumn in events;
+    
+    @test_logs begin
+        run_unfold(data_df, bfDict; verbose = false, eventcolumn="trial_type");
     end
 end
