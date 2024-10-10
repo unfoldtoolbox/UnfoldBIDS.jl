@@ -1,4 +1,4 @@
-using Pkg.Artifacts 
+using Artifacts 
 using ArtifactUtils
 
 # Get path to the Artifact.toml
@@ -13,7 +13,7 @@ if isnothing(noise_hash) || !artifact_exists(noise_hash)
     add_artifact!(
                      "Artifacts.toml",
                      "sample_BIDS",
-                     "https://osf.io/download/n4e7c/", # Change this line to actual dataset
+                     "https://osf.io/download/zarwp/", # Change this line to actual dataset
                      force=true,
                      lazy=true, # If lazy is set to true, even if download information is available, this artifact will not be downloaded until it is accessed via the artifact"name" syntax, or ensure_artifact_installed() is called upon it.
                     )

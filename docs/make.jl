@@ -2,6 +2,15 @@ using UnfoldBIDS
 using Documenter
 using Glob
 using Literate
+#import Artifacts
+import LazyArtifacts
+
+# We need this macro to use Artifacts in the docs
+macro artifact_str(s)
+    LazyArtifacts.@artifact_str(s)
+end
+
+sample_BIDS = @show artifact"sample_BIDS"
 
 
 GENERATED = joinpath(@__DIR__, "src", "generated")
@@ -35,14 +44,16 @@ makedocs(;
             "Quickstart" => "generated/tutorials/quickstart.md",
         ],
         "Reference" => [
-            "Overview: Toolbox Functions" => "./generated/reference/overview.md",
+            "API: Toolbox Functions" => "api.md",
             "Brain Imaging Data Structure" => "./generated/reference/BIDS.md"
         ],
         "HowTo" => [
             "Apply preprocessing functions" => "./generated/HowTo/ApplyPreprocessing.md",
         ],
-        "DocStrings" => "api.md",
     ],
 )
 
-deploydocs(; repo = "github.com/unfoldtoolbox/UnfoldBIDS.jl", devbranch = "main")
+deploydocs(; 
+    repo = "github.com/unfoldtoolbox/UnfoldBIDS.jl",
+    push_preview = true,
+    devbranch = "main")
