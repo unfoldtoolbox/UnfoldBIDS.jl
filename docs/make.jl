@@ -2,6 +2,15 @@ using UnfoldBIDS
 using Documenter
 using Glob
 using Literate
+import Artifacts
+#import LazyArtifacts
+
+# We need this macro to use Artifacts in the docs
+macro artifact_str(s)
+    Artifacts.@artifact_str(s)
+end
+
+sample_BIDS = @show artifact"sample_BIDS"
 
 
 GENERATED = joinpath(@__DIR__, "src", "generated")

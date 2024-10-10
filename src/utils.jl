@@ -19,7 +19,7 @@ Run Unfold analysis on all data in dataDF.
 - `verbose::Bool = true)`\\
    Show ProgressBar or not.
 """
-function run_unfold(dataDF, bfDict; eventcolumn="event",removeTimeexpandedXs=true, extract_data = raw_to_data, verbose::Bool=true, kwargs...)
+function run_unfold(dataDF, bfDict; eventcolumn="event",removeTimeexpandedXs=true, extract_data::Function = raw_to_data, verbose::Bool=true, kwargs...)
 
     resultsDF = DataFrame()
 
@@ -29,7 +29,7 @@ function run_unfold(dataDF, bfDict; eventcolumn="event",removeTimeexpandedXs=tru
 
 		if verbose
             update(pbar)
-            #@printf("Loading subject %s at:\n %s \n",row.subject, file_path)
+            #@printf("Loading subject %s \n",row.subject)
         end
 
         tmpEvents = row.events
@@ -40,9 +40,18 @@ function run_unfold(dataDF, bfDict; eventcolumn="event",removeTimeexpandedXs=tru
         # Fit Model
         m = fit(UnfoldModel, bfDict, tmpEvents, tmpData; eventcolumn=eventcolumn)
 
-        if removeTimeexpandedXs && (m isa UnfoldLinearModelContinuousTime || m isa UnfoldLinearModelContinuousTime)
-            m = typeof(m)(m.design, Unfold.DesignMatrix(designmatrix(m).formulas, missing, designmatrix(m).events), m.modelfit)
+		
+        if removeTimeexpandedXs && (m isa UnfoldLinearModel || m isa UnfoldLinearModelContinuousTime)
+            #m = typeof(m)(m.design, Unfold.DesignMatrix(designmatrix(m).formulas, missing, designmatrix(m).events), m.modelfit)
+            m.designmatrix = [
+                    typeof(m.designmatrix[k])(
+                        Unfold.formulas(m)[k],
+                        Unfold.empty_modelmatrix(designmatrix(m)[k]),
+                        Unfold.events(m)[k],
+                    ) for k = 1:length(m.designmatrix)
+                ]
         end
+
         results = DataFrame(subject = row.subject, ses=row.ses, task=row.task, run=row.run,  model = m)
 
         append!(resultsDF, results)
@@ -58,7 +67,7 @@ end
 
 Function to get data from MNE raw object. Can choose specific channels; default loads all channels.
 """
-function raw_to_data(raw; channels::AbstractVector{<:Union{String,Integer}}=[])
+function raw_to_data(raw; channels::AbstractVector{<:Union{String,Integer}}=["all"])
     return pyconvert(Array, raw.get_data(picks=pylist(channels), units="uV"))
 end
 
