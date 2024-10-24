@@ -36,6 +36,7 @@ makedocs(;
         prettyurls = get(ENV, "CI", "false") == "true",
         canonical = "https://unfoldtoolbox.github.io/UnfoldBIDS.jl",
         edit_link = "main",
+        sidebar_sitename = false,
         assets = String[],
     ),
     pages = [
@@ -49,6 +50,7 @@ makedocs(;
         ],
         "HowTo" => [
             "Apply preprocessing functions" => "./generated/HowTo/ApplyPreprocessing.md",
+            "Find non-BIDS conform data" => "./generated/HowTo/find_non_bids.md"
         ],
     ],
 )
