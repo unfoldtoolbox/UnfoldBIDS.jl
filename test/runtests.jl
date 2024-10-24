@@ -158,7 +158,7 @@ end
     basisfunction = firbasis(τ=(-0.2,.8),sfreq=1024)
     f  = @formula 0~1
     bfDict = ["stimulus"=>(f,basisfunction)]
-    UnfoldBIDS.add_latency_from_df(data_df, :sample) # add :latency collumn in events;
+    UnfoldBIDS.rename_to_latency(data_df, :sample) # add :latency collumn in events;
     
     @test_logs begin
         run_unfold(data_df, bfDict; verbose = false, eventcolumn="trial_type");

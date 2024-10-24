@@ -34,7 +34,7 @@ function run_unfold(dataDF, bfDict; eventcolumn="event",remove_time_expanded_Xs=
 
         tmpEvents = row.events
 
-        tmpData = extract_data(row.data; kwargs...)
+        tmpData = extract_data(row.raw; kwargs...)
 
 
         # Fit Model
@@ -134,11 +134,11 @@ function unpack_results(results_df)
 end
 
 """
-	add_latency_from_df(data_df)
+	rename_to_latency(data_df)
 
 This is a convenience function to add a :latency collumn (needed by Unfold) based on another variable in the events_df (e.g. sample)
 """
-function add_latency_from_df(data_df, symbol::Symbol)
+function rename_to_latency(data_df, symbol::Symbol)
 	for row in eachrow(data_df); row.events.latency = row.events[!,symbol]; end
 end
 

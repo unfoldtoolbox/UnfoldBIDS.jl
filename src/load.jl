@@ -168,16 +168,16 @@ function load_bids_eeg_data(layout_df; verbose::Bool=true, kwargs...)
 
         # Read in the EEG data as a dataframe using the appropriate reader
         if endswith(file_path, ".edf")
-            eeg_data = PyMNE.io.read_raw_edf(file_path, verbose="ERROR")
+            eeg_raw = PyMNE.io.read_raw_edf(file_path, verbose="ERROR")
         elseif endswith(file_path, ".vhdr")
-            eeg_data = PyMNE.io.read_raw_brainvision(file_path, verbose="ERROR")
+            eeg_raw = PyMNE.io.read_raw_brainvision(file_path, verbose="ERROR")
         elseif endswith(file_path, ".fif")
-            eeg_data = PyMNE.io.read_raw_fif(file_path, verbose="ERROR")
+            eeg_raw = PyMNE.io.read_raw_fif(file_path, verbose="ERROR")
         elseif endswith(file_path, ".set")
-            eeg_data = PyMNE.io.read_raw_eeglab(file_path, verbose="ERROR")
+            eeg_raw = PyMNE.io.read_raw_eeglab(file_path, verbose="ERROR")
         end
 
-        tmp_df = DataFrame(subject=row.subject, ses=row.ses, task=row.task, run=row.run, data=eeg_data)
+        tmp_df = DataFrame(subject=row.subject, ses=row.ses, task=row.task, run=row.run, raw=eeg_raw)
 
         append!(eeg_df, tmp_df)
     end

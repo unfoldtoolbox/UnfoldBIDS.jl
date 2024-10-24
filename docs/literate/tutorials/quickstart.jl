@@ -38,6 +38,6 @@ data_df = load_bids_eeg_data(layout_df)
 basisfunction = firbasis(τ=(-0.2,.8),sfreq=1024)
 f  = @formula 0~1
 bfDict = ["stimulus"=>(f,basisfunction)]
-UnfoldBIDS.add_latency_from_df(data_df, :sample) # Unfold expects a :latency collumn in your events; if your event latency is named differently you can use this function as remedy
+UnfoldBIDS.rename_to_latency(data_df, :sample) # Unfold expects a :latency collumn in your events; if your event latency is named differently you can use this function as remedy
 
 resultsAll = run_unfold(data_df, bfDict; eventcolumn="trial_type");
