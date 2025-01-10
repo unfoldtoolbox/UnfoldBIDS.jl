@@ -66,3 +66,10 @@ jobs:
             using UnfoldBIDS
             DocMeta.setdocmeta!(UnfoldBIDS, :DocTestSetup, :(using UnfoldBIDS); recursive=true)
             doctest(UnfoldBIDS)'
+      - name: Update UnfoldDocs
+        if: github.ref == 'refs/heads/main'
+        uses: peter-evans/repository-dispatch@v3
+        with:
+            token: ${{ secrets.UNFOLDDOCSPAT }}
+            repository: unfoldtoolbox/UnfoldDocs
+            event-type: individual-docs-updated
