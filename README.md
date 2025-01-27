@@ -6,7 +6,7 @@
 [Doc-img]: https://img.shields.io/badge/docs-stable-blue.svg
 [Doc-url]: https://unfoldtoolbox.github.io/UnfoldBIDS.jl/stable
 [dev-img]: https://img.shields.io/badge/docs-dev-blue.svg
-[dev-url]: https://unfoldtoolbox.github.io/UnfoldBIDS.jl/dev
+[dev-url]: https://unfoldtoolbox.github.io/UnfoldDocs/UnfoldBIDS.jl/dev/
 [semver-img]: https://img.shields.io/badge/semantic-versioning-green
 [build-img]: https://github.com/unfoldtoolbox/UnfoldBIDS.jl/actions/workflows/CI.yml/badge.svg?branch=main
 [build-url]: https://github.com/unfoldtoolbox/UnfoldBIDS.jl/actions/workflows/CI.yml?query=branch%3Amain
