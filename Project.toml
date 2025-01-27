@@ -1,7 +1,7 @@
 name = "UnfoldBIDS"
 uuid = "b54e767b-1ebd-4480-ac2a-f5f4d8853074"
 authors = ["Rene Skukies", "Benedikt Ehinger"]
-version = "0.3.0"
+version = "0.3.1"
 
 [deps]
 Artifacts = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
@@ -21,14 +21,14 @@ Unfold = "181c99d8-e21b-4ff3-b70b-c233eddec679"
 Artifacts = "1"
 CSV = "0.10"
 Continuables = "1.0"
-DataFrames = "1 - 1.6"
-DataFramesMeta = "0.14"
+DataFrames = "1"
+DataFramesMeta = "0.14, 0.15"
 Printf = "1"
 ProgressBars = "1.5"
 PyMNE = "0.1, 0.2"
 Statistics = "1.1"
 StatsModels = "0.6, 0.7"
-Unfold = "0.5, 0.6, 0.7"
+Unfold = "0.5, 0.6, 0.7, 0.8"
 julia = "1"
 
 [extras]
