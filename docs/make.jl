@@ -43,6 +43,7 @@ makedocs(;
         "Home" => "index.md",
         "Tutorials" => [
             "Quickstart" => "generated/tutorials/quickstart.md",
+            "Calculate group average" => "generated/tutorials/group_average.md",
         ],
         "Reference" => [
             "API: Toolbox Functions" => "api.md",
