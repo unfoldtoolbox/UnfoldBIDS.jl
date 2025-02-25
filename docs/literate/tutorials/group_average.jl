@@ -3,11 +3,12 @@
 using UnfoldBIDS
 using Unfold
 using DataFrames
+using Statistics
 using CairoMakie, AlgebraOfGraphics
 using LazyArtifacts
 using Main: @artifact_str # this is a workaround for Artifacts used in docs; locally you would `using LazyArtifacts`
 
-# Load data
+# First let's redo the steps from the quickstart
 sample_data_path = artifact"sample_BIDS"
 layout_df = bids_layout(sample_data_path, derivatives=false)
 data_df = load_bids_eeg_data(layout_df)
@@ -20,7 +21,7 @@ UnfoldBIDS.rename_to_latency(data_df, :sample) # Unfold expects a :latency collu
 
 resultsAll = run_unfold(data_df, bfDict; eventcolumn="trial_type");
 
-# Transform data into tidier format
+# Now let's, transform the data into a tidier format
 ct = bids_coeftable(resultsAll)
 tidy = unpack_results(ct)
 @show tidy
