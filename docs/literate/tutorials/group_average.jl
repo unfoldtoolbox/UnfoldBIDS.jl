@@ -2,6 +2,7 @@
 
 using UnfoldBIDS
 using Unfold
+using DataFrames
 using LazyArtifacts
 using Main: @artifact_str # this is a workaround for Artifacts used in docs; locally you would `using LazyArtifacts`
 
@@ -25,3 +26,5 @@ tidy = unpack_results(ct)
 
 # Calculate average over subjects
 stim_mean_df = combine(groupby(tidy, [:time, :trial_type]), :yhat => mean)
+
+# Importantly, the above can be extended to `groupby`an arbitrary number of covariates!
