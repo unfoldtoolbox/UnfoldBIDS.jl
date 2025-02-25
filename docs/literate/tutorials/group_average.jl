@@ -3,6 +3,7 @@
 using UnfoldBIDS
 using Unfold
 using DataFrames
+using CairoMakie, AlgebraOfGraphics
 using LazyArtifacts
 using Main: @artifact_str # this is a workaround for Artifacts used in docs; locally you would `using LazyArtifacts`
 
@@ -25,6 +26,9 @@ tidy = unpack_results(ct)
 @show tidy
 
 # Calculate average over subjects
-stim_mean_df = combine(groupby(tidy, [:time, :trial_type]), :yhat => mean)
+mean_df = combine(groupby(tidy, [:time, :coefname]), :estimate => mean)
 
 # Importantly, the above can be extended to `groupby`an arbitrary number of covariates!
+
+# Plot results using AOG
+data(mean_df) * mapping(:time, :estimate_mean, color = :coefname, group=:coefname => nonnumeric) * visual(Lines) |> draw
