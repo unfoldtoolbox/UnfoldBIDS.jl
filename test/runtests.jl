@@ -12,9 +12,9 @@ using Logging
     files_df = DataFrame(Sub=[], Ses=[], Task=[], Run=[], File=[])
     
     # Test case 1: All fields present
-    file1 = "sub-01_ses-02_task-rest_run-01_bold.vhdr"
+    file1 = "sub-WhatASubject01_ses-02_task-rest_run-01_bold.vhdr"
     files_df = UnfoldBIDS.extract_subject_id!(files_df, file1)
-    @test isequal(files_df[1, :], DataFrame(Sub = "01", Ses = "02", Task = "rest", Run = "01", File = file1)[1,:])
+    @test isequal(files_df[1, :], DataFrame(Sub = "WhatASubject01", Ses = "02", Task = "rest", Run = "01", File = file1)[1,:])
 
     # Test case 2: Missing run
     file2 = "sub-03_ses-04_task-taskname_bold.vhdr"
