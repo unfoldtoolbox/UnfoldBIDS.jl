@@ -102,10 +102,10 @@ Internal function to get subject information from dataframe.
  function extract_subject_id!(files_df, file)
 
     # Make regex for parts
-    regex_sub = r"sub-(\d+)"
-    regex_ses = r"ses-(\d+)"
+    regex_sub = r"sub-(.+?)_"
+    regex_ses = r"ses-(.+?)_"
     regex_task = r"task-(.+?)_"
-    regex_run = r"run-(\d+)"
+    regex_run = r"run-(.+?)_"
 
     # Match and add to DataFrame
     sub = match(regex_sub, file)
