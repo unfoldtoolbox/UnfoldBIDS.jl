@@ -134,6 +134,30 @@ function unpack_results(results_df)
 end
 
 """
+	bids_effects(model_df::DataFrame, effects_dict::Dict)
+
+Calculate [mariginalized effect](https://unfoldtoolbox.github.io/UnfoldDocs/Unfold.jl/stable/generated/HowTo/effects/) on all subjects found in the model dataframe using `effects_dict`.
+"""
+function bids_effects(model_df::DataFrame, effects_dict::Dict)
+
+	all_results = DataFrame()
+	for row in eachrow(model_df)
+		tmp_df = effects(effects_dict, row.model);
+
+		tmp_df.subject .= row.subject
+		tmp_df.ses .= row.ses
+		tmp_df.task .= row.task
+		tmp_df.run .= row.run
+		append!(all_results, tmp_df)
+	end
+	
+	# Change collumn order to look nicer
+	select!(all_results, :subject, :ses, :task, :run, Not([:subject, :ses, :task, :run]))
+
+	return all_results
+end
+
+"""
 	rename_to_latency(data_df)
 
 This is a convenience function to add a :latency collumn (needed by Unfold) based on another variable in the events_df (e.g. sample)

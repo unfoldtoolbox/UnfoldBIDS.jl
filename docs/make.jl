@@ -43,7 +43,6 @@ makedocs(;
         "Home" => "index.md",
         "Tutorials" => [
             "Quickstart" => "generated/tutorials/quickstart.md",
-            "Calculate group average" => "generated/tutorials/group_average.md",
         ],
         "Reference" => [
             "API: Toolbox Functions" => "api.md",
@@ -51,6 +50,8 @@ makedocs(;
         ],
         "HowTo" => [
             "Apply preprocessing functions" => "./generated/HowTo/ApplyPreprocessing.md",
+            "Calculate group average" => "generated/HowTo/group_average.md",
+            "Save/ load Unfold results" => "generated/HowTo/IO.md",
             "Find non-BIDS conform data" => "./generated/HowTo/find_non_bids.md"
         ],
     ],

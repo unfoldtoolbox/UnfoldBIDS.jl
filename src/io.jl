@@ -142,7 +142,7 @@ end
 """
     _load_results(files_df; generate_Xs::Bool = true)
 
-Internal function to load Unfold models into memory. Can also be used to load data after file information was loaded lazily (lazy=true) using load_results()
+Internal function to load Unfold models into memory. Can also be used to load data after file information was loaded lazily (lazy=true) using [`load_results()`](@ref)
 """
 function _load_results(files_df, generate_Xs::Bool = true)
 
