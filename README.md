@@ -59,8 +59,8 @@ bidsPath::AbstractString; # Path to BIDS root folder
 
 # Kwargs
 - derivatives::Bool=true: Do you want to us the derivative/ processed data? Default = true
-- specificFolder::Union{Nothing,AbstractString}=nothing: If you want a specific folder in derivatives or root specify here
-- excludeFolder::Union{Nothing,AbstractString}=nothing: You can exclude specific folders when not looking for a specific sub-folder 
+- specific_folder::Union{Nothing,AbstractString}=nothing: If you want a specific folder in derivatives or root specify here
+- exclude_folder::Union{Nothing,AbstractString}=nothing: You can exclude specific folders when not looking for a specific sub-folder 
 - ses::Union{Nothing,AbstractString}=nothing: Specify session; will load all sessions if not specified
 - task::Union{Nothing,AbstractString}=nothing: Specify task; will load all tasks if not specified
 - run::Union{Nothing,AbstractString}=nothing): Specify run; will load all runs if not specified
@@ -82,7 +82,7 @@ results = unpack_results(results_df)
 ```
 
 
-> **Note:** The ```specificFolder``` option will look for the folder either in the root (i.e. provided bidsPath -> bidsPath/specificFolder) or in the derivative (i.e. bidsPath/derivatives -> bidsPath/derivatives/specificFolder) based on the derivative flag!  
+> **Note:** The ```specific_folder``` option will look for the folder either in the root (i.e. provided bidsPath -> bidsPath/specific_folder) or in the derivative (i.e. bidsPath/derivatives -> bidsPath/derivatives/specific_folder) based on the derivative flag!  
 
 ### Supported EEG file types
 - edf
