@@ -78,7 +78,7 @@ Load Unfold models existing in a `derivatives_subfolder` in your BIDS root folde
 - `lazy::Bool = false`\\
    Do not actually load the dataset into memore if true, only return a dataframe with paths
 - `generate_Xs::Bool = true`\\
-   Do not recreate the designmatrix; improves loading time.
+   By default recreate the designmatrix; Can be set to false, to improve loading time.
 - `ses::Union{Nothing,AbstractString} = nothing`\\
    Which session to load; loads all if nothing
 - `task::Union{Nothing,AbstractString} = nothing`\\
