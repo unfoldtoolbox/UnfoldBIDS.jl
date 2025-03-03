@@ -5,7 +5,7 @@
         overwrite::Bool=false)
 
 Function to save unfold models in your BIDS root folder. Automatically creates a `derivatives_subfolder` (default = "Unfold") in the derivatives and subsequentely safes each model in results according to BIDS.
-Example of path so saved file: `bids_root/derivatives/Unfold/sub-XXX/eeg/sub-XXX_ses-XX_task-XXX_run-XX_unfold.jld2`
+Example of path to saved file: `bids_root/derivatives/Unfold/sub-XXX/eeg/sub-XXX_ses-XX_task-XXX_run-XX_unfold.jld2`
 
 # Keywords
 
@@ -69,7 +69,7 @@ end
         task::Union{Nothing,AbstractString}=nothing,
         run::Union{Nothing,AbstractString}=nothing)
 
-Load Unfold models existing in a derivatives_subfolder in your BIDS root folder. 
+Load Unfold models existing in a `derivatives_subfolder` in your BIDS root folder. 
 
 # Keywords
 
