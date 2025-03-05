@@ -16,9 +16,8 @@ data_df = load_bids_eeg_data(layout_df);
 
 # Calculate results
 basisfunction = firbasis(τ=(-0.2,.8),sfreq=1024)
-basisfunction_resp = firbasis(τ=(-0.4,.4),sfreq=1024)
 f  = @formula 0~1
-bfDict = ["stimulus"=>(f,basisfunction), "response"=>(f,basisfunction_resp)]
+bfDict = ["stimulus"=>(f,basisfunction)]
 UnfoldBIDS.rename_to_latency(data_df, :sample); # Unfold expects a :latency collumn in your events; if your event latency is named differently you can use this function as remedy
 
 resultsAll = run_unfold(data_df, bfDict; eventcolumn="trial_type");
@@ -28,11 +27,11 @@ tidy_df = unpack_results(bids_coeftable(resultsAll))
 first(tidy_df, 5)
 
 # ## Calculate average over subjects
-mean_df = combine(groupby(tidy_df, [:time, :coefname, :eventname]), :estimate => mean)
+mean_df = combine(groupby(tidy_df, [:time, :coefname]), :estimate => mean)
 first(mean_df, 5)
 
 # Importantly, the above can be extended to `groupby`an arbitrary number of covariates!
 
 # ## Plot results using AOG
-plt = data(mean_df) * mapping(:time, :estimate_mean, color = :eventname, group=:eventname => nonnumeric) * visual(Lines)
+plt = data(mean_df) * mapping(:time, :estimate_mean, color = :coefname, group=:coefname => nonnumeric) * visual(Lines)
 draw(plt, axis=(yticklabelsvisible=false,))
