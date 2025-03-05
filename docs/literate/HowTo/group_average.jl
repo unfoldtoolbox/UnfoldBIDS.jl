@@ -28,7 +28,7 @@ tidy_df = unpack_results(bids_coeftable(resultsAll))
 first(tidy_df, 5)
 
 # ## Calculate average over subjects
-mean_df = combine(groupby(tidy_df, [:time, :coefname, eventname]), :estimate => mean)
+mean_df = combine(groupby(tidy_df, [:time, :coefname, :eventname]), :estimate => mean)
 first(mean_df, 5)
 
 # Importantly, the above can be extended to `groupby`an arbitrary number of covariates!
