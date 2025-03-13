@@ -90,7 +90,7 @@ function unpack_events(df::DataFrame)
 		append!(all_events, tmp_df)
 	end
 	# Change collumn order to look nicer
-	select!(all_results, :subject, :ses, :task, :run, Not([:subject, :ses, :task, :run]))
+	select!(all_events, :subject, :ses, :task, :run, Not([:subject, :ses, :task, :run]))
 	return all_events
 end
 
