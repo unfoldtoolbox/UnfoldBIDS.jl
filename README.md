@@ -51,6 +51,8 @@ Pkg.add("UnfoldBIDS")
 using UnfoldBIDS
 
 
+!!! note
+    UnfoldBIDS.jl currently only works on paths and filenames, but ignores information from `.json` files.
 # To look up the paths of all subjects and store in a Dataframe:
 layout_df = bids_layout(bidsPath::AbstractString; kwargs)
 """
@@ -58,7 +60,7 @@ layout_df = bids_layout(bidsPath::AbstractString; kwargs)
 bidsPath::AbstractString; # Path to BIDS root folder
 
 # Kwargs
-- derivatives::Bool=true: Do you want to us the derivative/ processed data? Default = true
+- derivatives::Bool=true: Do you want to us the derivative/ processed data?
 - specific_folder::Union{Nothing,AbstractString}=nothing: If you want a specific folder in derivatives or root specify here
 - exclude_folder::Union{Nothing,AbstractString}=nothing: You can exclude specific folders when not looking for a specific sub-folder 
 - ses::Union{Nothing,AbstractString}=nothing: Specify session; will load all sessions if not specified
