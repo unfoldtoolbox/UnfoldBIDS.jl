@@ -53,6 +53,7 @@ using UnfoldBIDS
 
 !!! note
     UnfoldBIDS.jl currently only works on paths and filenames, but ignores information from `.json` files.
+
 # To look up the paths of all subjects and store in a Dataframe:
 layout_df = bids_layout(bidsPath::AbstractString; kwargs)
 """
