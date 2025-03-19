@@ -49,12 +49,12 @@ Pkg.add("UnfoldBIDS")
 
 ```julia
 using UnfoldBIDS
+```
 
+### Look up the paths of all subjects and store in a Dataframe
+> **Note:**    UnfoldBIDS.jl currently only works on paths and filenames, but ignores information from `.json` files.
 
-!!! note
-    UnfoldBIDS.jl currently only works on paths and filenames, but ignores information from `.json` files.
-
-# To look up the paths of all subjects and store in a Dataframe:
+```julia
 layout_df = bids_layout(bidsPath::AbstractString; kwargs)
 """
 # Input
@@ -69,23 +69,28 @@ bidsPath::AbstractString; # Path to BIDS root folder
 - run::Union{Nothing,AbstractString}=nothing): Specify run; will load all runs if not specified
 
 """
-
-# To load all data into memory/ one dataframe:           
-eeg_df = load_bids_eeg_data(layout_df; verbose::Bool=true, kwargs...)
-
-# To run Unfold model (bf_dict = basis functions dictionary; see Unfold.jl):
-models_df = run_unfold(eeg_df, bf_dict; eventcolumn="event", removeTimeexpandedXs=true, extract_data = raw_to_data, verbose::Bool=true, kwargs...)
-
-# For dataframe containing tidy results
-results_df = bids_coeftable(models_df)
-
-# To unpack results into one big tidy DataFrame, with subject information
-results = unpack_results(results_df)
-
 ```
 
+### Load all data into memory/ one dataframe:           
+```julia
+eeg_df = load_bids_eeg_data(layout_df; verbose::Bool=true, kwargs...)
+```
 
-> **Note:** The ```specific_folder``` option will look for the folder either in the root (i.e. provided bidsPath -> bidsPath/specific_folder) or in the derivative (i.e. bidsPath/derivatives -> bidsPath/derivatives/specific_folder) based on the derivative flag!  
+### Run Unfold model 
+```julia
+models_df = run_unfold(eeg_df, bf_dict; eventcolumn="event", removeTimeexpandedXs=true, extract_data = raw_to_data, verbose::Bool=true, kwargs...)
+```
+(`bf_dict` = basis functions dictionary; see [Unfold.jl](https://unfoldtoolbox.github.io/UnfoldDocs/Unfold.jl/stable/)):
+
+### For dataframe containing tidy results
+```julia
+results_df = bids_coeftable(models_df)
+```
+
+### Unpack single subject tidy results into one big tidy DataFrame, with subject information
+```julia
+results = unpack_results(results_df)
+```
 
 ### Supported EEG file types
 - edf
