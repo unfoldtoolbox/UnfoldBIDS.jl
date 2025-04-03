@@ -14,7 +14,7 @@ If you need more information on BIDS, a quick overview and further reading can b
 </div>
 ```
 
-## Key features
+## Key features & usage
 ![Flowchart showing UnfoldBIDS' place in the Unfold environment](assets/2025UnfoldBIDSFlowChart.png)
 
 ## Installation
@@ -22,9 +22,6 @@ If you need more information on BIDS, a quick overview and further reading can b
 julia> using Pkg; Pkg.add("UnfoldBIDS")
 ```
 For more detailed instructions please refer to [Installing Julia & Unfold Packages](https://unfoldtoolbox.github.io/UnfoldDocs/main/installation/).
-
-
-## Usage example
 
 
 ## Where to start: Learning roadmap
