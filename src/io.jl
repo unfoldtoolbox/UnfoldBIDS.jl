@@ -5,7 +5,7 @@
         overwrite::Bool=false)
 
 Function to save unfold models in your BIDS root folder. Automatically creates a `derivatives_subfolder` (default = "Unfold") in the derivatives and subsequentely safes each model in results according to BIDS.
-Example of path so saved file: `bids_root/derivatives/Unfold/sub-XXX/eeg/sub-XXX_ses-XX_task-XXX_run-XX_unfold.jld2`
+Example of path to saved file: `bids_root/derivatives/Unfold/sub-XXX/eeg/sub-XXX_ses-XX_task-XXX_run-XX_unfold.jld2`
 
 # Keywords
 
@@ -69,7 +69,7 @@ end
         task::Union{Nothing,AbstractString}=nothing,
         run::Union{Nothing,AbstractString}=nothing)
 
-Load Unfold models existing in a derivatives_subfolder in your BIDS root folder. 
+Load Unfold models existing in a `derivatives_subfolder` in your BIDS root folder. 
 
 # Keywords
 
@@ -78,7 +78,7 @@ Load Unfold models existing in a derivatives_subfolder in your BIDS root folder.
 - `lazy::Bool = false`\\
    Do not actually load the dataset into memore if true, only return a dataframe with paths
 - `generate_Xs::Bool = true`\\
-   Do not recreate the designmatrix; improves loading time.
+   By default recreate the designmatrix; Can be set to false, to improve loading time.
 - `ses::Union{Nothing,AbstractString} = nothing`\\
    Which session to load; loads all if nothing
 - `task::Union{Nothing,AbstractString} = nothing`\\
@@ -142,7 +142,7 @@ end
 """
     _load_results(files_df; generate_Xs::Bool = true)
 
-Internal function to load Unfold models into memory. Can also be used to load data after file information was loaded lazily (lazy=true) using load_results()
+Internal function to load Unfold models into memory. Can also be used to load data after file information was loaded lazily (lazy=true) using [`load_results()`](@ref)
 """
 function _load_results(files_df, generate_Xs::Bool = true)
 

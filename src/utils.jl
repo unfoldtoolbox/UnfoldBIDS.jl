@@ -90,7 +90,7 @@ function unpack_events(df::DataFrame)
 		append!(all_events, tmp_df)
 	end
 	# Change collumn order to look nicer
-	select!(all_results, :subject, :ses, :task, :run, Not([:subject, :ses, :task, :run]))
+	select!(all_events, :subject, :ses, :task, :run, Not([:subject, :ses, :task, :run]))
 	return all_events
 end
 
@@ -127,6 +127,30 @@ function unpack_results(results_df)
 		tmp_df.run .= row.run
 		append!(all_results, tmp_df)
 	end
+	# Change collumn order to look nicer
+	select!(all_results, :subject, :ses, :task, :run, Not([:subject, :ses, :task, :run]))
+
+	return all_results
+end
+
+"""
+	bids_effects(model_df::DataFrame, effects_dict::Dict)
+
+Calculate [mariginalized effect](https://unfoldtoolbox.github.io/UnfoldDocs/Unfold.jl/stable/generated/HowTo/effects/) on all subjects found in the model dataframe using `effects_dict`.
+"""
+function bids_effects(model_df::DataFrame, effects_dict::Dict)
+
+	all_results = DataFrame()
+	for row in eachrow(model_df)
+		tmp_df = effects(effects_dict, row.model);
+
+		tmp_df.subject .= row.subject
+		tmp_df.ses .= row.ses
+		tmp_df.task .= row.task
+		tmp_df.run .= row.run
+		append!(all_results, tmp_df)
+	end
+	
 	# Change collumn order to look nicer
 	select!(all_results, :subject, :ses, :task, :run, Not([:subject, :ses, :task, :run]))
 

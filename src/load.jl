@@ -7,7 +7,7 @@
         task::Union{Nothing,AbstractString}=nothing,
         run::Union{Nothing,AbstractString}=nothing)
 
-Main function to load paths of all subjects in one bids_root folder. Will return a DataFrame containing all found paths with specific subject information. Used before loading data into memore using @Ref(`load_bids_eeg_data`)
+Main function to load paths of all subjects in one `bids_root` folder. Will return a DataFrame containing all found paths with specific subject information. Used before loading data into memore using [`load_bids_eeg_data`](@ref)
 
 ## Keywords
 - `derivatives::Bool = true`\\
@@ -144,7 +144,7 @@ end
 """
     load_bids_eeg_data(layout_df; verbose::Bool=true, kwargs...)
 
-Load data found with @Ref('bids_layout') into memory.
+Load data found with [`bids_layout`](@ref) into memory.
 
 - `verbose::Bool = true`\\
    Show ProgressBar
