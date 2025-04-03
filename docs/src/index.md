@@ -31,12 +31,12 @@ For more detailed instructions please refer to [Installing Julia & Unfold Packag
 ### 2. Intermediate topics
 📌 Goal: Use DataFrames to calculate group averages
 
-🔗 [Calculate group average](@ref)
+🔗 [Calculate group average](generated/HowTo/group_average.md)
 
 ### 3. Advanced topics
 📌 Goal: Data preprocessing using MNE
 
-🔗 [Apply preprocessing functions](@ref)
+🔗 [Apply preprocessing functions](./generated/HowTo/ApplyPreprocessing.md)
 
 
 ## Statement of need
