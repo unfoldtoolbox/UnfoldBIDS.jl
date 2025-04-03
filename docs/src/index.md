@@ -15,7 +15,7 @@ If you need more information on BIDS, a quick overview and further reading can b
 ```
 
 ## Key features
-
+![Flowchart showing UnfoldBIDS' place in the Unfold environment](assets/2025UnfoldBIDSFlowChart.png)
 
 ## Installation
 ```julia-repl
