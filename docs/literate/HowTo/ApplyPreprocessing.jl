@@ -19,16 +19,16 @@
 # function raw_to_filtered_data(raw; channels::AbstractVector{<:Union{String,Integer}}=[], l_freq=0.5, h_freq=45)
 #
 #   # Load data into memory
-#	  raw.load_data()
+#   raw.load_data()
 #
-# 	# Re-reference to mastoids and add Cz back in
-# 	UnfoldBIDS.PyMNE.add_reference_channels(raw, ref_channels=UnfoldBIDS.pylist(["Cz"]), copy=false)
-# 	raw.set_eeg_reference(ref_channels=UnfoldBIDS.pylist(["RM", "LM"]))
+#   # Re-reference to mastoids and add Cz back in
+#   UnfoldBIDS.PyMNE.add_reference_channels(raw, ref_channels=UnfoldBIDS.pylist(["Cz"]), copy=false)
+#   raw.set_eeg_reference(ref_channels=UnfoldBIDS.pylist(["RM", "LM"]))
 # 
-# 	# Filter data
-# 	raw.filter(l_freq, h_freq, picks="eeg")
+#   # Filter data
+#   raw.filter(l_freq, h_freq, picks="eeg")
 #   
-# 	return UnfoldBIDS.pyconvert(Array, raw.get_data(picks=UnfoldBIDS.pylist(channels), units="uV"))
+#   return UnfoldBIDS.pyconvert(Array, raw.get_data(picks=UnfoldBIDS.pylist(channels), units="uV"))
 # end
 # ```
 # 
@@ -36,18 +36,18 @@
 #
 # ```julia
 # function ref_and_filter_data!(raw; l_freq=0.5, h_freq=45)
-# 	raw.load_data()
+#   raw.load_data()
 # 
-# 	# Re-reference to mastoids and add Cz back in
-# 	UnfoldBIDS.PyMNE.add_reference_channels(raw, ref_channels=UnfoldBIDS.pylist(["Cz"]), copy=false)
-# 	raw.set_eeg_reference(ref_channels=UnfoldBIDS.pylist(["RM", "LM"]))
+#   # Re-reference to mastoids and add Cz back in
+#   UnfoldBIDS.PyMNE.add_reference_channels(raw, ref_channels=UnfoldBIDS.pylist(["Cz"]), copy=false)
+#   raw.set_eeg_reference(ref_channels=UnfoldBIDS.pylist(["RM", "LM"]))
 # 
-# 	# Filter data
-# 	raw.filter(l_freq, h_freq, picks="eeg")
+#   # Filter data
+#   raw.filter(l_freq, h_freq, picks="eeg")
 # 
 # end
 # 
 # for row in eachrow(loaded_data_df)
-# 		ref_and_filter_data!(row.raw)
+#   ref_and_filter_data!(row.raw)
 # end
 # ```
