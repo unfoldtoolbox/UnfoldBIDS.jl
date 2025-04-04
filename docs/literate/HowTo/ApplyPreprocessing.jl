@@ -17,6 +17,8 @@
 # 
 # ```julia
 # function raw_to_filtered_data(raw; channels::AbstractVector{<:Union{String,Integer}}=[], l_freq=0.5, h_freq=45)
+#
+#   # Load data into memory
 #	  raw.load_data()
 #
 # 	# Re-reference to mastoids and add Cz back in
