@@ -1,4 +1,4 @@
-# # How to find non-BIDS data
+# # How to find non-BIDS and/or non-EEG data
 
 # In some cases you might want to use a dataset that is not (entirely) BIDS compatible. While UnfoldBIDS.jl is expecting you to comply with the BIDS structure, you can also make use of the underlying functions to (at least) find your data.
 
@@ -10,7 +10,7 @@
 # Where
 # - `path::String = path_to_data_folder`; should be input with `abspath()` \
 #
-# - `file_ending::String = data_file_ending`; UnfoldBIDS is looking for `file_ending = [".set", ".fif", ".vhdr", ".edf"]`, but maybe you are looking for a `".mat"`? \
+# - `file_ending::String = data_file_ending`; UnfoldBIDS is looking for `file_ending = [".set", ".fif", ".vhdr", ".edf"]`, but maybe you are looking for a `".mat"` or `".nifti"`? \
 #
 # - `file_pattern::String = ses_task_run`; this control for which session/task/run you are looking for (e.g. `"ses-001"`); can be empty String to look for everything: `file_pattern = [""]` \
 #
@@ -18,9 +18,6 @@
 
 # In an applied case you would then:
 # ```julia
-# # Init a files DataFrame
-# files_df = DataFrame(subject=[], ses=[], task=[], run=[], file=[])  # Initialize an empty DataFrame to hold results
-# 
 # # path settings
 # bidsPath = "path/to/folder"
 # file_ending = [".mat"]
@@ -28,7 +25,7 @@
 # exclude = nothing
 # 
 # # Find paths
-# all_paths = collect(list_all_paths(abspath(bidsPath), file_ending, file_pattern, exclude=exclude))
+# all_paths = collect(UnfoldBIDS.list_all_paths(abspath(bidsPath), file_ending, file_pattern, exclude=exclude))
 # ```
 
 # !!! note
