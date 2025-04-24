@@ -8,6 +8,7 @@ Welcome to the documentation for [UnfoldBIDS](https://github.com/unfoldtoolbox/U
 
 If you need more information on BIDS, a quick overview and further reading can be found at [Reference/Brain Imaging Data Structure](./generated/reference/BIDS.md)
 
+![Flowchart showing UnfoldBIDS' place in the Unfold environment](assets/2025UnfoldBIDSFlowChart.png)
 
 ```@raw html
 <div style="width:60%; margin: auto;">
@@ -15,7 +16,10 @@ If you need more information on BIDS, a quick overview and further reading can b
 ```
 
 ## Key features & usage
-![Flowchart showing UnfoldBIDS' place in the Unfold environment](assets/2025UnfoldBIDSFlowChart.png)
+- Find paths to all subject data within a BIDS dataset with one function 🔎
+- Apply MNE-preprocessing ⚒️
+- Apply Unfold.jl style analysis on all subjects in one go ⚡
+- Made using DataFrames.jl, ready for second level analysis 🏁
 
 ## Installation
 ```julia-repl
