@@ -99,7 +99,7 @@ end
 
 Internal function to get subject information from dataframe.
 """
- function extract_subject_id!(files_df, file)
+ function extract_subject_id!(files_df, file_path)
 
     # Make regex for parts
     regex_sub = r"sub-(.+?)_"
@@ -108,6 +108,7 @@ Internal function to get subject information from dataframe.
     regex_run = r"run-(.+?)_"
 
     # Match and add to DataFrame
+    file = basename(file_path)
     sub = match(regex_sub, file)
     ses = match(regex_ses, file)
     task = match(regex_task, file)
@@ -117,7 +118,7 @@ Internal function to get subject information from dataframe.
         !isnothing(ses) ? ses.captures[1] : missing,
         !isnothing(task) ? task.captures[1] : missing,
         !isnothing(run) ? run.captures[1] : missing,
-        file))
+        file_path))
     return files_df
 end
 
