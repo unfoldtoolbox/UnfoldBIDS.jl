@@ -38,8 +38,9 @@ function run_unfold(dataDF, bfDict; eventcolumn="event", eventfields=[:sample],r
 
         tmpEvents = row.events
 
-		# Assert if eventfield in data
-		
+		# Assert if first eventfield in events
+		@assert String(eventfields[1]) ∈ names(tmpEvents) "Eventfield $(eventfields[1]) not found in events DataFrame. This field is required to define event onsets. Please set the eventfields argument to the collumn that defines your event onsets (in samples)."
+
         tmpData = extract_data(row.raw; kwargs...)
 
 
