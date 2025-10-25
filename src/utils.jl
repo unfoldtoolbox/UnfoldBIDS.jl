@@ -185,3 +185,15 @@ list_all_paths(path, file_ending, file_pattern; exclude=nothing) = @cont begin
 		end
 	end
 end
+
+"""
+path = erp_core_example()
+
+	Convenience function to load a BIDS conform folder containing three subjects of the P300 task of ERP-Core dataset.
+	Returns path to BIDS root folder
+"""
+
+function erp_core_example()
+	path = artifact"sample_BIDS"
+	return path
+end
