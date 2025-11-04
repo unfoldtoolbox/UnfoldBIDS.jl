@@ -1,12 +1,20 @@
 """
 	run_unfold(data_df, bf_vec; 
-		eventcolumn="event",
 		remove_time_expanded_Xs=true, 
 		extract_data = raw_to_data, 
 		verbose::Bool=true, 
 		kwargs...)
 
 Run Unfold analysis on all data in data_df.
+
+## Arguments
+- `data_df::DataFrame`\\
+   DataFrame containing BIDS data as returned by `load_bids_data()`. Must contain collumns: :subject, :ses, :task, :run, :raw, :events
+- `bf_vec`\\
+   Basis function vector as expected by Unfold.jl's `fit()` function.\\
+	Can be one of: \\
+	- `["eventname" => (formula, basisfunction)]` for overlap corrected models
+	- `["eventname" => (formula, timewindow)]` for mass-univariate models, where indicates (start, stop) in seconds with `typeof(timewindow) = Tuple{Real, Real}`
 
 ## Keywords
 
@@ -20,7 +28,7 @@ Run Unfold analysis on all data in data_df.
    Will be passed to *both* the `fit()` and  `extract_data()` calls as function inputs.\\
    For possible kwargs to `fit()` please have a look at the Unfold.jl API: https://unfoldtoolbox.github.io/UnfoldDocs/Unfold.jl/stable/references/functions/
 """
-function run_unfold(data_df::DataFrame, bf_vec; overlap_corrected::Bool = true, remove_time_expanded_Xs=true, extract_data::Function = raw_to_data, verbose::Bool=true, kwargs...)
+function run_unfold(data_df::DataFrame, bf_vec; remove_time_expanded_Xs=true, extract_data::Function = raw_to_data, verbose::Bool=true, kwargs...)
 	# Init results dataframe
     results_df = DataFrame()
 
@@ -46,10 +54,27 @@ function run_unfold(data_df::DataFrame, bf_vec; overlap_corrected::Bool = true, 
 
         tmp_data = extract_data(row.raw; extract_data_kwargs...)
 
+		# Check for type of model to fit
+		tmp = last(bf_vec[1])
 
-        # Fit Model
-		if overlap_corrected
+        # Fit Overlap Corrected Model if BasisFunction is used
+		if supertype(typeof(tmp[2])) == Unfold.BasisFunction
         	m = fit(UnfoldModel, bf_vec, tmp_events, tmp_data; fit_kwargs...)
+		
+		# Fit Mass-Univariate Model if time window tuple is used
+		elseif typeof(tmp[2]) == Tuple{Real, Real}
+			@assert size(bf_vec, 1) == 1 && bf_vec[1][1] != Any "Currently only one event type is supported for Mass-Univariate models with UnfoldBIDS. Please change your bf_vec accordingly."
+
+			# Get sfreq from raw
+			sfreq = pyconvert(Real, row.raw.info["sfreq"])
+
+			# Epoch data
+			evts = @rsubset(tmp_events, :event .== bf_vec[1][1])
+			data_epochs, times = Unfold.epoch(data = tmp_data, tbl = evts, τ = tmp[2], sfreq = sfreq);
+
+			# Fit Mass-Univariate Model
+			m = fit(UnfoldModel, tmp[1], data_epochs, times; fit_kwargs...)
+
 		end
 		
         if remove_time_expanded_Xs && (m isa UnfoldLinearModel || m isa UnfoldLinearModelContinuousTime)
