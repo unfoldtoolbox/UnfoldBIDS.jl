@@ -22,7 +22,7 @@ Run Unfold analysis on all data in data_df.
 """
 function run_unfold(data_df::DataFrame, bf_vec; overlap_corrected::Bool = true, remove_time_expanded_Xs=true, extract_data::Function = raw_to_data, verbose::Bool=true, kwargs...)
 	# Init results dataframe
-    resultsDF = DataFrame()
+    results_df = DataFrame()
 
 	# Check kwargs
 	fit_keys = (:fit, :contrasts, :eventcollumn, :solver. :show_progress, :eventfields, :show_warnings)
@@ -65,11 +65,11 @@ function run_unfold(data_df::DataFrame, bf_vec; overlap_corrected::Bool = true, 
 
         results = DataFrame(subject = row.subject, ses=row.ses, task=row.task, run=row.run,  model = m)
 
-        append!(resultsDF, results)
+        append!(results_df, results)
 
 
     end
-    return resultsDF
+    return results_df
 end
 
 """
