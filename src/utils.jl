@@ -1,19 +1,15 @@
 """
-	run_unfold(dataDF, bfDict; 
+	run_unfold(data_df, bf_vec; 
 		eventcolumn="event",
 		remove_time_expanded_Xs=true, 
 		extract_data = raw_to_data, 
 		verbose::Bool=true, 
 		kwargs...)
 
-Run Unfold analysis on all data in dataDF.
+Run Unfold analysis on all data in data_df.
 
 ## Keywords
 
-- `eventcolumn::String = "event"`\\
-   Which collumn Unfold should use during the analysis.
-- `eventfields::Array=[:sample]`\\
-   (optional, default `[:latency]`) Array of symbols, representing column names in `tbl`, which are passed to basisfunction event-wise. First field of array always defines eventonset in samples.
 - `remove_time_expanded_Xs::Bool = true`\\
    Removes the timeexpanded designmatrix which significantly reduces the memory-consumption. This Xs is rarely needed, but can be recovered (look into the Unfold.load function)
 - `extract_data::function = raw_to_data`\\
@@ -21,32 +17,40 @@ Run Unfold analysis on all data in dataDF.
 - `verbose::Bool = true)`\\
    Show ProgressBar or not.
 - `kwargs...`\\
-   Will be passed to `extract_data` as function inputs.
+   Will be passed to *both* the `fit()` and  `extract_data()` calls as function inputs.\\
+   For possible kwargs to `fit()` please have a look at the Unfold.jl API: https://unfoldtoolbox.github.io/UnfoldDocs/Unfold.jl/stable/references/functions/
 """
-function run_unfold(dataDF, bfDict; eventcolumn="event", eventfields=[:sample],remove_time_expanded_Xs=true, extract_data::Function = raw_to_data, verbose::Bool=true, kwargs...)
-
+function run_unfold(data_df::DataFrame, bf_vec; overlap_corrected::Bool = true, remove_time_expanded_Xs=true, extract_data::Function = raw_to_data, verbose::Bool=true, kwargs...)
+	# Init results dataframe
     resultsDF = DataFrame()
 
-	pbar = ProgressBar(total=size(dataDF, 1))
+	# Check kwargs
+	fit_keys = (:fit, :contrasts, :eventcollumn, :solver. :show_progress, :eventfields, :show_warnings)
+	fit_kwargs = (; (k => v for (k, v) in pairs(kwargs) if k ∈ fit_keys)...)
+	extract_data_kwargs = (; (k => v for (k, v) in pairs(kwargs) if k ∉ fit_keys)...)
 
-    for row in eachrow(dataDF)
+	# Init progress bar
+	pbar = ProgressBar(total=size(data_df, 1))
+
+    for row in eachrow(data_df)
 
 		if verbose
             update(pbar)
             #@printf("Loading subject %s \n",row.subject)
         end
 
-        tmpEvents = row.events
+        tmp_events = row.events
 
 		# Assert if first eventfield in events
-		@assert String(eventfields[1]) ∈ names(tmpEvents) "Eventfield $(eventfields[1]) not found in events DataFrame. This field is required to define event onsets. Please set the eventfields argument to the collumn that defines your event onsets (in samples)."
+		@assert String(eventfields[1]) ∈ names(tmp_events) "Eventfield $(eventfields[1]) not found in events DataFrame. This field is required to define event onsets. Please set the eventfields argument to the collumn that defines your event onsets (in samples)."
 
-        tmpData = extract_data(row.raw; kwargs...)
+        tmp_data = extract_data(row.raw; extract_data_kwargs...)
 
 
         # Fit Model
-        m = fit(UnfoldModel, bfDict, tmpEvents, tmpData; eventcolumn=eventcolumn, eventfields=eventfields)
-
+		if overlap_corrected
+        	m = fit(UnfoldModel, bf_vec, tmp_events, tmp_data; fit_kwargs...)
+		end
 		
         if remove_time_expanded_Xs && (m isa UnfoldLinearModel || m isa UnfoldLinearModelContinuousTime)
             #m = typeof(m)(m.design, Unfold.DesignMatrix(designmatrix(m).formulas, missing, designmatrix(m).events), m.modelfit)
