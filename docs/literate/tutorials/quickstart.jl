@@ -1,16 +1,15 @@
 # # Quickstart
 
-using UnfoldBIDS
+using UnfoldBIDS, PyMNE # PyMNE is needed because loading ins now an extension
 using Unfold
 using LazyArtifacts
-using Main: @artifact_str # this is a workaround for Artifacts used in docs; locally you would `using LazyArtifacts`
 
 # ## Loading data
 
 # To load use UnfoldBIDS to find the paths to all subject specific data you can uye the bidsLayout function:
 # 
 
-sample_data_path = artifact"sample_BIDS"
+sample_data_path = UnfoldBIDS.erp_core_example()
 layout_df = bids_layout(sample_data_path, derivatives=false)
 
 # This will give you a DataFrame containing the paths too the eeg files of all subjects plus their accompanying event files

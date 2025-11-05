@@ -17,7 +17,7 @@ If you need more information on BIDS, a quick overview and further reading can b
 
 ## Key features & usage
 - Find paths to all subject data within a BIDS dataset with one function 🔎
-- Apply MNE-preprocessing ⚒️
+- Apply MNE-preprocessing directly before the fit ⚒️
 - Apply Unfold.jl style analysis on all subjects in one go ⚡
 - Made using DataFrames.jl, ready for second level analysis 🏁
 

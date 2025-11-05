@@ -1,16 +1,15 @@
 # # Calculate group averages
 
-using UnfoldBIDS
+using UnfoldBIDS, PyMNE
 using Unfold
 using DataFrames
 using Statistics
 using CairoMakie, AlgebraOfGraphics
 using LazyArtifacts
-using Main: @artifact_str # this is a workaround for Artifacts used in docs; locally you would `using LazyArtifacts`
 
 # ## Analysis
 # First let's redo the steps from the quickstart tutorial
-sample_data_path = artifact"sample_BIDS"
+sample_data_path = UnfoldBIDS.erp_core_example();
 layout_df = bids_layout(sample_data_path, derivatives=false);
 data_df = load_bids_eeg_data(layout_df);
 

@@ -1,4 +1,4 @@
-using Unfold, UnfoldBIDS
+using Unfold, UnfoldBIDS, PyMNE
 using LazyArtifacts
 using Test
 using DataFrames

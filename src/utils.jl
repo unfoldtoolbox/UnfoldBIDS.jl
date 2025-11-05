@@ -5,7 +5,7 @@
 		verbose::Bool=true, 
 		kwargs...)
 
-Run Unfold analysis on all data in data_df.
+Run Unfold analysis on all data in data_df. Needs to have PyMNE.jl loaded!
 
 ## Arguments
 - `data_df::DataFrame`\\
@@ -28,83 +28,14 @@ Run Unfold analysis on all data in data_df.
    Will be passed to *both* the `fit()` and  `extract_data()` calls as function inputs.\\
    For possible kwargs to `fit()` please have a look at the Unfold.jl API: https://unfoldtoolbox.github.io/UnfoldDocs/Unfold.jl/stable/references/functions/
 """
-function run_unfold(data_df::DataFrame, bf_vec; remove_time_expanded_Xs=true, extract_data::Function = raw_to_data, verbose::Bool=true, kwargs...)
-	# Init results dataframe
-    results_df = DataFrame()
-
-	# Check kwargs
-	fit_keys = (:fit, :contrasts, :eventcollumn, :solver. :show_progress, :eventfields, :show_warnings)
-	fit_kwargs = (; (k => v for (k, v) in pairs(kwargs) if k ∈ fit_keys)...)
-	extract_data_kwargs = (; (k => v for (k, v) in pairs(kwargs) if k ∉ fit_keys)...)
-
-	# Init progress bar
-	pbar = ProgressBar(total=size(data_df, 1))
-
-    for row in eachrow(data_df)
-
-		if verbose
-            update(pbar)
-            #@printf("Loading subject %s \n",row.subject)
-        end
-
-        tmp_events = row.events
-
-		# Assert if first eventfield in events
-		@assert String(eventfields[1]) ∈ names(tmp_events) "Eventfield $(eventfields[1]) not found in events DataFrame. This field is required to define event onsets. Please set the eventfields argument to the collumn that defines your event onsets (in samples)."
-
-        tmp_data = extract_data(row.raw; extract_data_kwargs...)
-
-		# Check for type of model to fit
-		tmp = last(bf_vec[1])
-
-        # Fit Overlap Corrected Model if BasisFunction is used
-		if supertype(typeof(tmp[2])) == Unfold.BasisFunction
-        	m = fit(UnfoldModel, bf_vec, tmp_events, tmp_data; fit_kwargs...)
-		
-		# Fit Mass-Univariate Model if time window tuple is used
-		elseif typeof(tmp[2]) == Tuple{Real, Real}
-			@assert size(bf_vec, 1) == 1 && bf_vec[1][1] != Any "Currently only one event type is supported for Mass-Univariate models with UnfoldBIDS. Please change your bf_vec accordingly."
-
-			# Get sfreq from raw
-			sfreq = pyconvert(Real, row.raw.info["sfreq"])
-
-			# Epoch data
-			evts = @rsubset(tmp_events, :event .== bf_vec[1][1])
-			data_epochs, times = Unfold.epoch(data = tmp_data, tbl = evts, τ = tmp[2], sfreq = sfreq);
-
-			# Fit Mass-Univariate Model
-			m = fit(UnfoldModel, tmp[1], data_epochs, times; fit_kwargs...)
-
-		end
-		
-        if remove_time_expanded_Xs && (m isa UnfoldLinearModel || m isa UnfoldLinearModelContinuousTime)
-            #m = typeof(m)(m.design, Unfold.DesignMatrix(designmatrix(m).formulas, missing, designmatrix(m).events), m.modelfit)
-            m.designmatrix = [
-                    typeof(m.designmatrix[k])(
-                        Unfold.formulas(m)[k],
-                        Unfold.empty_modelmatrix(designmatrix(m)[k]),
-                        Unfold.events(m)[k],
-                    ) for k = 1:length(m.designmatrix)
-                ]
-        end
-
-        results = DataFrame(subject = row.subject, ses=row.ses, task=row.task, run=row.run,  model = m)
-
-        append!(results_df, results)
-
-
-    end
+function run_unfold(args...; kwargs...)
+	ext_mne = Base.get_extension(@__MODULE__, :MNEext)
+   if !isnothing(ext_mne)
+      results_df = ext_mne._run_unfold(args...; kwargs...)
+   else
+      error("PyMNE is needed to handle MNE Raw objects. Please make sure to load PyMNE.jl explicitly. Use ]add PyMNE.jl and using PyMNE to install/ load it.")
+   end
     return results_df
-end
-
-"""
-	raw_to_data(raw; channels::AbstractVector{<:Union{String,Integer}}=[])
-
-
-Function to get data from MNE raw object. Can choose specific channels; default loads all channels.
-"""
-function raw_to_data(raw; channels::AbstractVector{<:Union{String,Integer}}=["all"])
-    return pyconvert(Array, raw.get_data(picks=pylist(channels), units="uV"))
 end
 
 """

@@ -5,7 +5,7 @@ using StatsModels, DataFrames, DataFramesMeta, Statistics, Printf
 using ProgressBars, Continuables
 using LazyArtifacts
 # file loading
-using PyMNE, CSV
+using CSV
 # unfold
 using Unfold
 
@@ -29,5 +29,7 @@ export save_results, load_results
 
 import StatsModels.FormulaTerm # for exporting
 export FormulaTerm
+
+
 
 end
