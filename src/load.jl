@@ -158,7 +158,7 @@ function load_bids_eeg_data(layout_df; verbose::Bool=true, kwargs...)
    if !isnothing(ext_mne)
       eeg_df = ext_mne._load_bids_eeg_data(layout_df; verbose=verbose, kwargs...)
    else
-      error("PyMNE is needed to handle MNE Raw objects. Please make sure to load PyMNE.jl explicitly. Use ]add PyMNE.jl and using PyMNE to install/ load it.")
+      error("If you want to use this function to load data via PyMNE, please make sure to load PyMNE.jl explicitly. Use ]add PyMNE.jl and using PyMNE to install/ load it.")
    end
    
    # Return the combined EEG data dataframe
