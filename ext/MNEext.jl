@@ -5,62 +5,24 @@ using DataFrames, DataFramesMeta
 using ProgressBars
 
 """
-    _load_bids_eeg_data(layout_df; verbose::Bool=true, kwargs...)
+    _load_bids_eeg_data(file_path::String)
 
 Internal function to load BIDS EEG data given a bidsLayout DataFrame.
-
-- `verbose::Bool = true`\\
-   Show ProgressBar
-- `kwargs...`\\
-   kwargs for CSV.read to load events from .tsv file; e.g. to specify delimeter
 """
-function _load_bids_eeg_data(layout_df; verbose::Bool = true, kwargs...)
+function _load_with_mne(file_path::String)
 
-    # Initialize an empty dataframe
-    eeg_df = DataFrame()
-
-    pbar = ProgressBar(total = size(layout_df, 1))
-
-    # Loop through each EEG data file
-    for row in eachrow(layout_df)
-        file_path = row.file
-        if verbose
-            update(pbar)
-            #@printf("Loading subject %s at:\n %s \n",row.subject, file_path)
-        end
-
-        # Read in the EEG data as a dataframe using the appropriate reader
-        if endswith(file_path, ".edf")
-            eeg_raw = PyMNE.io.read_raw_edf(file_path, verbose = "ERROR")
-        elseif endswith(file_path, ".vhdr")
-            eeg_raw = PyMNE.io.read_raw_brainvision(file_path, verbose = "ERROR")
-        elseif endswith(file_path, ".fif")
-            eeg_raw = PyMNE.io.read_raw_fif(file_path, verbose = "ERROR")
-        elseif endswith(file_path, ".set")
-            eeg_raw = PyMNE.io.read_raw_eeglab(file_path, verbose = "ERROR")
-        end
-
-        tmp_df = DataFrame(
-            subject = row.subject,
-            ses = row.ses,
-            task = row.task,
-            run = row.run,
-            raw = eeg_raw,
-        )
-
-        append!(eeg_df, tmp_df)
+    # Read in the EEG data as a dataframe using the appropriate reader
+    if endswith(file_path, ".edf")
+        eeg_raw = PyMNE.io.read_raw_edf(file_path, verbose = "ERROR")
+    elseif endswith(file_path, ".vhdr")
+        eeg_raw = PyMNE.io.read_raw_brainvision(file_path, verbose = "ERROR")
+    elseif endswith(file_path, ".fif")
+        eeg_raw = PyMNE.io.read_raw_fif(file_path, verbose = "ERROR")
+    elseif endswith(file_path, ".set")
+        eeg_raw = PyMNE.io.read_raw_eeglab(file_path, verbose = "ERROR")
     end
 
-    # try to add events
-    try
-        events = UnfoldBIDS.load_events(layout_df; kwargs...)
-        eeg_df[!, :events] = events.events
-    catch
-        @warn "Something went wrong while adding events to DataFrame. Needs manual intervention."
-    end
-
-    # Return the combined EEG data dataframe
-    return eeg_df
+    return eeg_raw
 end
 
 

@@ -23,13 +23,15 @@ Main function to load paths of all subjects in one `bids_root` folder. Will retu
 - `run::Union{Nothing,AbstractString} = nothing`\\
    Which run to load; loads all if nothing
 """
-function bids_layout(bidsPath::AbstractString;
-    derivatives::Bool=true,
-    specific_folder::Union{Nothing,AbstractString}=nothing,
-    exclude_folder::Union{Nothing,AbstractString}=nothing,
-    ses::Union{Nothing,AbstractString}=nothing,
-    task::Union{Nothing,AbstractString}=nothing,
-    run::Union{Nothing,AbstractString}=nothing)
+function bids_layout(
+    bidsPath::AbstractString;
+    derivatives::Bool = true,
+    specific_folder::Union{Nothing,AbstractString} = nothing,
+    exclude_folder::Union{Nothing,AbstractString} = nothing,
+    ses::Union{Nothing,AbstractString} = nothing,
+    task::Union{Nothing,AbstractString} = nothing,
+    run::Union{Nothing,AbstractString} = nothing,
+)
 
     # Any files with these endings will be returned
     file_ending = [".set", ".fif", ".vhdr", ".edf"]
@@ -67,13 +69,17 @@ function bids_layout(bidsPath::AbstractString;
 
 
 
-    files_df = DataFrame(subject=[], ses=[], task=[], run=[], file=[])  # Initialize an empty DataFrame to hold results
+    files_df = DataFrame(subject = [], ses = [], task = [], run = [], file = [])  # Initialize an empty DataFrame to hold results
 
-    all_paths = collect(list_all_paths(abspath(bidsPath), file_ending, file_pattern, exclude=exclude))
+    all_paths = collect(
+        list_all_paths(abspath(bidsPath), file_ending, file_pattern, exclude = exclude),
+    )
     #all_paths = collect(find_paths(abspath(bidsPath), exclude));
 
     if isempty(all_paths)
-        throw("No files found at $bidsPath; make sure you have the right path and that your directory is BIDS compatible.")
+        throw(
+            "No files found at $bidsPath; make sure you have the right path and that your directory is BIDS compatible.",
+        )
     end
 
     # Add additional information
@@ -99,7 +105,7 @@ end
 
 Internal function to get subject information from dataframe.
 """
- function extract_subject_id!(files_df, file_path)
+function extract_subject_id!(files_df, file_path)
 
     # Make regex for parts
     regex_sub = r"sub-(.+?)_"
@@ -113,12 +119,16 @@ Internal function to get subject information from dataframe.
     ses = match(regex_ses, file)
     task = match(regex_task, file)
     run = match(regex_run, file)
-    push!(files_df, (
-        !isnothing(sub) ? sub.captures[1] : missing,
-        !isnothing(ses) ? ses.captures[1] : missing,
-        !isnothing(task) ? task.captures[1] : missing,
-        !isnothing(run) ? run.captures[1] : missing,
-        file_path))
+    push!(
+        files_df,
+        (
+            !isnothing(sub) ? sub.captures[1] : missing,
+            !isnothing(ses) ? ses.captures[1] : missing,
+            !isnothing(task) ? task.captures[1] : missing,
+            !isnothing(run) ? run.captures[1] : missing,
+            file_path,
+        ),
+    )
     return files_df
 end
 
@@ -152,17 +162,58 @@ Load data found with [`bids_layout`](@ref) into memory.
 - `kwargs...`\\
    kwargs for CSV.read to load events from .tsv file; e.g. to specify delimeter
 """
-function load_bids_eeg_data(layout_df; verbose::Bool=true, kwargs...)
+function load_bids_eeg_data(
+    layout_df;
+    loading_function::Union{Nothing,Function} = nothing,
+    verbose::Bool = true,
+    kwargs...,
+)
+    # Initialize an empty dataframe
+    eeg_df = DataFrame()
 
-   ext_mne = Base.get_extension(@__MODULE__, :MNEext)
-   if !isnothing(ext_mne)
-      eeg_df = ext_mne._load_bids_eeg_data(layout_df; verbose=verbose, kwargs...)
-   else
-      error("If you want to use this function to load data via PyMNE, please make sure to load PyMNE.jl explicitly. Use ]add PyMNE.jl and using PyMNE to install/ load it.")
-   end
-   
-   # Return the combined EEG data dataframe
-   return eeg_df
+    pbar = ProgressBar(total = size(layout_df, 1))
+
+
+    ext_mne = Base.get_extension(@__MODULE__, :MNEext)
+    if isnothing(ext_mne) && isnothing(loading_function)
+        error(
+            "Either provide your own loading function or make sure to load PyMNE.jl explicitly. Use ]add PyMNE.jl and using PyMNE to install/ load it.",
+        )
+    elseif !isnothing(ext_mne) && isnothing(loading_function) # Fallback to PyMNE if it's loaded and no function provided
+        loading_function = _load_with_mne
+    end
+
+    # Loop through each EEG data file
+    for row in eachrow(layout_df)
+        file_path = row.file
+        if verbose
+            update(pbar)
+        end
+
+        # Read EEG data using the provided loading function
+        eeg_raw = loading_function(file_path)
+
+        tmp_df = DataFrame(
+            subject = row.subject,
+            ses = row.ses,
+            task = row.task,
+            run = row.run,
+            raw = eeg_raw,
+        )
+
+        append!(eeg_df, tmp_df)
+    end
+
+    # try to add events
+    try
+        events = UnfoldBIDS.load_events(layout_df; kwargs...)
+        eeg_df[!, :events] = events.events
+    catch
+        @warn "Something went wrong while adding events to DataFrame. Needs manual intervention."
+    end
+
+    # Return the combined EEG data dataframe
+    return eeg_df
 end
 
 #-----------------------------------------------------------------------------------------------
@@ -171,14 +222,18 @@ end
 # The function is deprecated but kept for convenience
 # NOTE: This is old and should be renamed; kept for now
 
-function collect_events(subjects::Vector{Any}, CSVPath::String; delimiter=nothing)
+function collect_events(subjects::Vector{Any}, CSVPath::String; delimiter = nothing)
     AllEvents = DataFrame()
     for sub in subjects
         pathFormated = Printf.Format(CSVPath)
 
         @assert(length(unique(pathFormated.formats)) == 1)
 
-        events = CSV.read(Printf.format(pathFormated, repeat([sub], length(pathFormated.formats))...), DataFrame, delim=delimiter)
+        events = CSV.read(
+            Printf.format(pathFormated, repeat([sub], length(pathFormated.formats))...),
+            DataFrame,
+            delim = delimiter,
+        )
         events.subject .= sub
         append!(AllEvents, events)
     end
@@ -240,7 +295,10 @@ function load_events(layoutDF::DataFrame; kwargs...)
         path = replace(s.file, basename(s.file) => "")
         events = CSV.read(joinpath(path, s.events), DataFrame; kwargs...)
         #events.subject .= s.subject
-        append!(all_events, DataFrame(subject=s.subject, task=s.task, run=s.run, events=events))
+        append!(
+            all_events,
+            DataFrame(subject = s.subject, task = s.task, run = s.run, events = events),
+        )
     end
 
     return all_events
