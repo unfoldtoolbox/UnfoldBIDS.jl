@@ -299,7 +299,13 @@ function load_events(layoutDF::DataFrame; kwargs...)
         #events.subject .= s.subject
         append!(
             all_events,
-            DataFrame(subject = s.subject, task = s.task, run = s.run, events = events),
+            DataFrame(
+                subject = s.subject,
+                ses = s.ses,
+                task = s.task,
+                run = s.run,
+                events = events,
+            ),
         )
     end
 

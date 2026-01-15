@@ -278,3 +278,50 @@ function erp_core_example()
     path = artifact"sample_BIDS"
     return path
 end
+
+"""
+    inspect_event(events_df::DataFrame, event_name::Symbol)
+    Inspect an event in the events DataFrame by plotting a unicode histogram and providing summary statistics.
+    
+    ## Arguments
+    - `events_df::DataFrame`\\
+       DataFrame containing events of all or one subject in tidy format. Can be :events collumn of a UnfoldBIDS data DataFrame for one subject or the output of UnfoldBIDS.unpack_events(data_df) for all subjects.\\
+    - `event_name::Symbol`\\
+       The name of the event to inspect (as found in the :event collumn of events_df).
+"""
+
+function inspect_event(events_df::DataFrame, event_name::Symbol)
+
+    # Extract event of interest
+    d = events_df[:, event_name]
+    name = String(event_name)
+
+    # Function to plot unicode histogram
+    h(name, d) =
+        TextBox(
+            @sprintf(
+                "{bold}%s{/bold} \nμ=%.2f,σ=%.2f\nmin=%.2f\nmax=%.2f",
+                name,
+                mean(d),
+                std(d),
+                minimum(d),
+                maximum(d)
+            ),
+            fit = true,
+        ) * (
+            histogram(
+                d,
+                vertical = true,
+                height = 1,
+                grid = false,
+                stats = false,
+                labels = false,
+                border = :none,
+                padding = 1,
+                margin = 0,
+            ) |> UnicodePlots.panel
+        )
+
+    h(name, d) |> print
+
+end
