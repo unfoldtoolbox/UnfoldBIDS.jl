@@ -157,6 +157,8 @@ end
 
 Load data found with [`bids_layout`](@ref) into memory.
 
+- `loading_function::Union{Nothing,Function} = nothing` \\
+   Function to load EEG data; if nothing provided and PyMNE.jl is loaded, it will use that as default. The function must take a single argument: the file path to the EEG data file.    
 - `verbose::Bool = true`\\
    Show ProgressBar
 - `kwargs...`\\
@@ -180,7 +182,7 @@ function load_bids_eeg_data(
             "Either provide your own loading function or make sure to load PyMNE.jl explicitly. Use ]add PyMNE.jl and using PyMNE to install/ load it.",
         )
     elseif !isnothing(ext_mne) && isnothing(loading_function) # Fallback to PyMNE if it's loaded and no function provided
-        loading_function = _load_with_mne
+        loading_function = ext_mne._load_with_mne
     end
 
     # Loop through each EEG data file

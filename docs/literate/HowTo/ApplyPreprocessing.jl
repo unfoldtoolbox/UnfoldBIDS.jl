@@ -5,7 +5,7 @@
 # 
 # I.e. `run_unfold(dataDF, bfDict; extract_data = your_custom_function)` 
 #
-# By default `raw_to_data` is used.  
+# By default `raw_to_data` is used, if PyMNE is loaded.  
 # 
 # ```julia
 # function raw_to_data(raw; channels::AbstractVector{<:Union{String,Integer}}=[])

@@ -1,6 +1,6 @@
 # # Quickstart
 
-using UnfoldBIDS, PyMNE # PyMNE is needed because loading ins now an extension
+using UnfoldBIDS, PyMNE # PyMNE is needed because loading is now an extension
 using Unfold
 using LazyArtifacts
 
@@ -10,7 +10,7 @@ using LazyArtifacts
 # 
 
 sample_data_path = UnfoldBIDS.erp_core_example()
-layout_df = bids_layout(sample_data_path, derivatives=false)
+layout_df = bids_layout(sample_data_path, derivatives = false)
 
 # This will give you a DataFrame containing the paths too the eeg files of all subjects plus their accompanying event files
 
@@ -34,10 +34,10 @@ data_df = load_bids_eeg_data(layout_df)
 # ## Run unfold type models
 
 
-basisfunction = firbasis(τ=(-0.2,.8),sfreq=1024)
-basisfunction_resp = firbasis(τ=(-0.4,.4),sfreq=1024)
-f  = @formula 0~1
-bfDict = ["stimulus"=>(f,basisfunction), "response"=>(f,basisfunction_resp)]
+basisfunction = firbasis(τ = (-0.2, 0.8), sfreq = 1024)
+basisfunction_resp = firbasis(τ = (-0.4, 0.4), sfreq = 1024)
+f = @formula 0 ~ 1
+bfDict = ["stimulus" => (f, basisfunction), "response" => (f, basisfunction_resp)]
 UnfoldBIDS.rename_to_latency(data_df, :sample) # Unfold expects a :latency collumn in your events; if your event latency is named differently you can use this function as remedy
 
-resultsAll = run_unfold(data_df, bfDict; eventcolumn="trial_type");
+resultsAll = run_unfold(data_df, bfDict; eventcolumn = "trial_type");
