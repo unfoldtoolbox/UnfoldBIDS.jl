@@ -29,11 +29,11 @@ bibliography: paper.bib
 
 # UnfoldBIDS.jl
 
-The analysis of complex naturalistic neuroscientific experiments requires new advanced analysis methods. A prominent tool gaining more popularity is the regression-based event-related potential (rERP) framework (Smith & Kutas, 2015), enabling single-trial analyses of EEG data with flexible modeling of covariates and overlap correction. The frameworks increasing popularity can in part be ascribed to the creation of various analysis-packages (e.g. Unfold.jl, LIMO, mTRF, Eelbrain), lowering the barrier to entry for researchers across disciplines.
+The analysis of complex naturalistic neuroscientific experiments requires new advanced analysis methods. A prominent tool gaining more popularity is the regression-based event-related potential (rERP) framework (@smith.kutas_2015; @smith.kutas_2015a), enabling single-trial analyses of EEG data with flexible modeling of covariates and overlap correction. The frameworks increasing popularity can in part be ascribed to the creation of various analysis-packages (e.g. Unfold.jl[@ehinger.alday_2025], LIMO[], mTRF[], Eelbrain[]), lowering the barrier to entry for researchers across disciplines.
 
-Parallel to methodological advances, the Brain Imaging Data Structure (BIDS; Gorgolewski et al., 2016; Pernet et al., 2019) has facilitated open sharing of large neuroscientific datasets. By establishing consistent file naming conventions and hierarchical folder structures, BIDS ensures that datasets are both human- and machine-readable, enabling efficient data querying, automated processing pipelines, and seamless integration across tools.
+Parallel to methodological advances, the Brain Imaging Data Structure (BIDS; @gorgolewski.etal_2016a; @pernet.etal_2019) has facilitated open sharing of large neuroscientific datasets. By establishing consistent file naming conventions and hierarchical folder structures, BIDS ensures that datasets are both human- and machine-readable, enabling efficient data querying, automated processing pipelines, and seamless integration across tools.
 
-Combining these two aspects, the UnfoldBIDS.jl package provides a coherent interface to seamlessly analyse BIDS structured datasets using @rerp models as implemented in Unfold.jl. Moreover, it sits well within the Unfold framework (Figure 1) and is compatible with the MNE-BIDS-pipeline (Gramfort et al., 2013; Larson et al., 2024; MNE-BIDS-Pipeline, n.d.).
+Combining these two aspects, the UnfoldBIDS.jl package provides a coherent interface to seamlessly analyse BIDS structured datasets using @rerp models as implemented in Unfold.jl. Moreover, it sits well within the Unfold framework (Figure 1) and is compatible with the MNE-BIDS-pipeline (@gramfort.etal_2013a; @larson.etal_2024).
 
 figure(
     ,
