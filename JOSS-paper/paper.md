@@ -1,3 +1,32 @@
+---
+title: 'UnfoldBIDS.jl: Streamlining regression ERP Analysis of BIDS-Compliant EEG Data in Julia'
+tags:
+  - Julia
+  - EEG
+  - ERPs
+  - evoked potentials
+  - neuroimaging
+  - Brain Imaging Data Structure
+  - time-series
+  - regression ERPs
+authors:
+  - name: René Skukies
+    orcid: 0000-0002-4124-4584  
+    equal-contrib: false
+    affiliation: "1, 2"
+  - name: Benedikt V. Ehinger
+    orcid:  0000-0002-6276-3332
+    equal-contrib: false
+    affiliation: "1, 2"
+affiliations:
+  - name: Institute for Visualisation and Interactive Systems, University of Stuttgart, Germany
+    index: 1
+  - name: Stuttgart Center for Simulation Science, University of Stuttgart, Germany
+    index: 2
+date: 22 January 2026
+bibliography: paper.bib
+---
+
 # UnfoldBIDS.jl
 
 The analysis of complex naturalistic neuroscientific experiments requires new advanced analysis methods. A prominent tool gaining more popularity is the regression-based event-related potential (rERP) framework (Smith & Kutas, 2015), enabling single-trial analyses of EEG data with flexible modeling of covariates and overlap correction. The frameworks increasing popularity can in part be ascribed to the creation of various analysis-packages (e.g. Unfold.jl, LIMO, mTRF, Eelbrain), lowering the barrier to entry for researchers across disciplines.
