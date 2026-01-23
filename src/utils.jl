@@ -280,21 +280,37 @@ function erp_core_example()
 end
 
 """
-    inspect_event(events_df::DataFrame, event_name::Symbol)
+    inspect_event(data_df::DataFrame, event_name::Symbol; subject::Union{String, Int}= "all")
     Inspect an event in the events DataFrame by plotting a unicode histogram and providing summary statistics.
     
     ## Arguments
-    - `events_df::DataFrame`\\
-       DataFrame containing events of all or one subject in tidy format. Can be :events collumn of a UnfoldBIDS data DataFrame for one subject or the output of UnfoldBIDS.unpack_events(data_df) for all subjects.\\
+    - `data_df::DataFrame`\\
+       DataFrame  containing all subjects and their events. Output of [`load_bids_eeg_data`](@ref)\\
     - `event_name::Symbol`\\
-       The name of the event to inspect (as found in the :event collumn of events_df).
+       The name of the event to inspect (as found in the :event collumn of events_df).\\
+
+    ## Keywords
+    - `subject::Union{String, Int} = "all"`\\
+       Specify a subject to inspect only its events. Default is "all" to inspect all subjects.
+    
 """
 
-function inspect_event(events_df::DataFrame, event_name::Symbol)
+function inspect_events(data_df::DataFrame, event_name::Symbol; subject::Union{String, Int}= "all")
+
+    # Extract event of interest`
+    if subject != "all"
+        @assert subject ∈ data_df.subject "Subject $(subject) not found in DataFrame."
+        events_df = @rsubset(data_df, :subject .== string(subject)).events
+    else
+        events_df = UnfoldBIDS.unpack_events(data_df)
+    end
+    
+    @assert names(events_df) ∋ event_name "Event $(event_name) not found in events DataFrame."
 
     # Extract event of interest
     d = events_df[:, event_name]
     name = String(event_name)
+
 
     # Function to plot unicode histogram
     h(name, d) =

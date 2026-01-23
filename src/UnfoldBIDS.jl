@@ -24,7 +24,7 @@ export load_bids_eeg_data
 export collect_events
 export run_unfold
 export bids_coeftable, bids_effects
-export unpack_events, unpack_results, inspect_event
+export unpack_events, unpack_results, inspect_events
 export save_results, load_results
 #export epochedFit
 
