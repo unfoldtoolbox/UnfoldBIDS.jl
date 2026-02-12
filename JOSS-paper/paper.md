@@ -51,11 +51,12 @@ Beyond Julia, prominent EEG processing toolboxes such as EEGLAB in Matlab and MN
 
 # Functionality
 ## Load and analyse data
-Users can perform a full rERP analysis across all subjects with just three commands:
+Users can perform a full rERP analysis across all subjects with just four commands:
 
 1. `bids_layout()` — constructs a tidy data frame of all BIDS-compliant files and metadata.
 2. `load_bids_eeg_data()` — loads EEG data and metadata into a structured format.
 3. `run_unfold()` — fits the rERP model using the specified design formula.
+4. `bids_coeftable()` — Turn models into tidy results.
 
 The resulting data frame structure enables easy inspection, filtering, and subset analysis (e.g., by condition, subject, or task type), enhancing transparency and reproducibility.
 
@@ -66,3 +67,11 @@ By default, UnfoldBIDS.jl assumes users have already preprocessed their data. Ho
 # Summary
 
 UnfoldBIDS.jl bridges a critical gap in the neuroimaging tool-chain by enabling efficient, reproducible, and scalable rERP analysis of BIDS-compliant EEG data within the Julia ecosystem. By combining the benefits of the rERP framework with the standardization of BIDS and the performance of Julia, it empowers researchers to conduct rigorous, transparent, and automated analyses.
+
+# Conflict of Interests
+
+The authors declare no conflict of interest.
+
+# Funding
+
+Funded by Deutsche Forschungsgemeinschaft (DFG, German Research Foundation) under Germany's Excellence Strategy - EXC 2075 – 390740016. We acknowledge the support by the Stuttgart Center for Simulation Science (SimTech).
