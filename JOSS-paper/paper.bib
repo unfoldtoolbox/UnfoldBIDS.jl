@@ -144,3 +144,60 @@
   keywords     = {read},
   file         = {C:\Users\ReneS\Zotero\storage\7UGAE6G5\Smith and Kutas - 2015 - Regression-based estimation of ERP waveforms II. .pdf}
 }
+
+@article{brodbeck.etal_2023,
+  title = {Eelbrain, a {{Python}} Toolkit for Time-Continuous Analysis with Temporal Response Functions},
+  author = {Brodbeck, Christian and Das, Proloy and Gillis, Marlies and Kulasingham, Joshua P. and Bhattasali, Shohini and Gaston, Phoebe and Resnik, Philip and Simon, Jonathan Z.},
+  date = {2023-11-29},
+  journaltitle = {eLife},
+  shortjournal = {Elife},
+  volume = {12},
+  eprint = {38018501},
+  eprinttype = {pubmed},
+  pages = {e85012},
+  issn = {2050-084X},
+  doi = {10.7554/eLife.85012},
+  abstract = {Even though human experience unfolds continuously in time, it is not strictly linear; instead, it entails cascading processes building hierarchical cognitive structures. For instance, during speech perception, humans transform a continuously varying acoustic signal into phonemes, words, and meaning, and these levels all have distinct but interdependent temporal structures. Time-lagged regression using temporal response functions (TRFs) has recently emerged as a promising tool for disentangling electrophysiological brain responses related to such complex models of perception. Here, we introduce the Eelbrain Python toolkit, which makes this kind of analysis easy and accessible. We demonstrate its use, using continuous speech as a sample paradigm, with a freely available EEG dataset of audiobook listening. A companion GitHub repository provides the complete source code for the analysis, from raw data to group-level statistics. More generally, we advocate a hypothesis-driven approach in which the experimenter specifies a hierarchy of time-continuous representations that are hypothesized to have contributed to brain responses, and uses those as predictor variables for the electrophysiological signal. This is analogous to a multiple regression problem, but with the addition of a time dimension. TRF analysis decomposes the brain signal into distinct responses associated with the different predictor variables by estimating a multivariate TRF (mTRF), quantifying the influence of each predictor on brain responses as a function of time(-lags). This allows asking two questions about the predictor variables: (1) Is there a significant neural representation corresponding to this predictor variable? And if so, (2) what are the temporal characteristics of the neural response associated with it? Thus, different predictor variables can be systematically combined and evaluated to jointly model neural processing at multiple hierarchical levels. We discuss applications of this approach, including the potential for linking algorithmic/representational theories at different cognitive levels to brain responses through computational models with appropriate linking hypotheses.},
+  langid = {english},
+  pmcid = {PMC10783870},
+  keywords = {Brain,Brain Mapping,Electroencephalography,human,Humans,neuroscience,open-source,reverse correlation,Speech,Speech Perception,STRF},
+  file = {C:\Users\ReneS\Zotero\storage\I9JYM7D4\Brodbeck et al. - 2023 - Eelbrain, a Python toolkit for time-continuous analysis with temporal response functions.pdf}
+}
+
+@article{pernet.etal_2011,
+  title = {{{LIMO EEG}}: {{A Toolbox}} for {{Hierarchical LInear MOdeling}} of {{ElectroEncephaloGraphic Data}}},
+  shorttitle = {{{LIMO EEG}}},
+  author = {Pernet, Cyril R. and Chauveau, Nicolas and Gaspar, Carl and Rousselet, Guillaume A.},
+  date = {2011-02-21},
+  journaltitle = {Computational Intelligence and Neuroscience},
+  volume = {2011},
+  pages = {e831409},
+  publisher = {Hindawi},
+  issn = {1687-5265},
+  doi = {10.1155/2011/831409},
+  url = {https://www.hindawi.com/journals/cin/2011/831409/},
+  urldate = {2023-01-12},
+  abstract = {Magnetic- and electric-evoked brain responses have traditionally been analyzed by comparing the peaks or mean amplitudes of signals from selected channels and averaged across trials. More recently, tools have been developed to investigate single trial response variability (e.g., EEGLAB) and to test differences between averaged evoked responses over the entire scalp and time dimensions (e.g., SPM, Fieldtrip). LIMO EEG is a Matlab toolbox (EEGLAB compatible) to analyse evoked responses over all space and time dimensions, while accounting for single trial variability using a simple hierarchical linear modelling of the data. In addition, LIMO EEG provides robust parametric tests, therefore providing a new and complementary tool in the analysis of neural evoked responses.},
+  langid = {english},
+  file = {C:\Users\ReneS\Zotero\storage\AIQRVAFH\Pernet et al. - 2011 - LIMO EEG A Toolbox for Hierarchical LInear MOdeli.pdf}
+}
+
+@article{crosse.etal_2016,
+  title = {The {{Multivariate Temporal Response Function}} ({{mTRF}}) {{Toolbox}}: {{A MATLAB Toolbox}} for {{Relating Neural Signals}} to {{Continuous Stimuli}}},
+  shorttitle = {The {{Multivariate Temporal Response Function}} ({{mTRF}}) {{Toolbox}}},
+  author = {Crosse, Michael J. and Di Liberto, Giovanni M. and Bednar, Adam and Lalor, Edmund C.},
+  date = {2016-11-30},
+  journaltitle = {Frontiers in Human Neuroscience},
+  shortjournal = {Front Hum Neurosci},
+  volume = {10},
+  eprint = {27965557},
+  eprinttype = {pubmed},
+  pages = {604},
+  issn = {1662-5161},
+  doi = {10.3389/fnhum.2016.00604},
+  url = {https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5127806/},
+  urldate = {2023-09-25},
+  abstract = {Understanding how brains process sensory signals in natural environments is one of the key goals of twenty-first century neuroscience. While brain imaging and invasive electrophysiology will play key roles in this endeavor, there is also an important role to be played by noninvasive, macroscopic techniques with high temporal resolution such as electro- and magnetoencephalography. But challenges exist in determining how best to analyze such complex, time-varying neural responses to complex, time-varying and multivariate natural sensory stimuli. There has been a long history of applying system identification techniques to relate the firing activity of neurons to complex sensory stimuli and such techniques are now seeing increased application to EEG and MEG data. One particular example involves fitting a filter—often referred to as a temporal response function—that describes a mapping between some feature(s) of a sensory stimulus and the neural response. Here, we first briefly review the history of these system identification approaches and describe a specific technique for deriving temporal response functions known as regularized linear regression. We then introduce a new open-source toolbox for performing this analysis. We describe how it can be used to derive (multivariate) temporal response functions describing a mapping between stimulus and response in both directions. We also explain the importance of regularizing the analysis and how this regularization can be optimized for a particular dataset. We then outline specifically how the toolbox implements these analyses and provide several examples of the types of results that the toolbox can produce. Finally, we consider some of the limitations of the toolbox and opportunities for future development and application.},
+  pmcid = {PMC5127806},
+  file = {C:\Users\ReneS\Zotero\storage\MJI2TP3D\Crosse et al. - 2016 - The Multivariate Temporal Response Function (mTRF).pdf}
+}
