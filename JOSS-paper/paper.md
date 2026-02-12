@@ -35,10 +35,7 @@ Parallel to methodological advances, the Brain Imaging Data Structure (BIDS; @go
 
 Combining these two aspects, the UnfoldBIDS.jl package provides a coherent interface to seamlessly analyse BIDS structured datasets using rERP models as implemented in Unfold.jl. Moreover, it sits well within the Unfold framework (Figure 1) and is compatible with the MNE-BIDS-pipeline (@gramfort.etal_2013a; @larson.etal_2024).
 
-figure(
-    ,
-  caption: [UnfoldBIDS.jl overview. Bold arrows indicate direct functionality. Dashed arrows indicate easy combination with other Unfold toolboxes and/ or future functionality for UnfoldBIDS.jl.]
-)
+![UnfoldBIDS.jl's position in the Unfold ecosystem. Bold arrows indicate direct functionality. Dashed arrows to other packages indicate easy combination with other Unfold toolboxes and/ or future functionality for UnfoldBIDS.jl. The lower code snippets show how a full dataset can be analysed with just four functions. \label{flowchart}](plots/2025UnfoldBIDSFlowChart.png){height="250pt"}
 
 # Package summary
 UnfoldBIDS.jl integrates loading and processing of BIDS-compliant datasets with the Unfold.jl package into a single, cohesive tool, enabling streamlined rERP analysis of BIDS-compliant data. This simplifies the otherwise cumbersome and potentially error-prone task of writing scripts to load subject data iteratively, reducing it to just a few lines of code.
