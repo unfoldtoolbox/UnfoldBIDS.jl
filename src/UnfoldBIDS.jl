@@ -2,7 +2,6 @@ module UnfoldBIDS
 
 # basics
 using StatsModels, DataFrames, DataFramesMeta, Statistics, Printf
-using UnicodePlots, Term
 using ProgressBars, Continuables
 using LazyArtifacts
 # file loading
@@ -31,6 +30,13 @@ export save_results, load_results
 import StatsModels.FormulaTerm # for exporting
 export FormulaTerm
 
+checkFun(sym) = Base.get_extension(@__MODULE__(), sym)
+function inspect_events(args...; kwargs...)
+    ext = checkFun(:UnfoldUnicodePlotsExt)
+    msg = "UnicodePlots and/or Term not loaded. Please use ]add UnicodePlots, Term, using UnicodePlots, Term to install them prior to using"
+    isnothing(ext) ? throw(msg) : ext.inspect_events(args...; kwargs...)
+end
 
+export inspect_events
 
 end
