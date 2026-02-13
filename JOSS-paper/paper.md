@@ -74,4 +74,5 @@ The authors declare no conflict of interest.
 
 # Funding
 
-Funded by Deutsche Forschungsgemeinschaft (DFG, German Research Foundation) under Germany's Excellence Strategy - EXC 2075 – 390740016. We acknowledge the support by the Stuttgart Center for Simulation Science (SimTech).
+Funded by Deutsche Forschungsgemeinschaft (DFG, German Research Foundation) in the
+Emmy Noether Programme - Project-ID 538578433 - and under Germany's Excellence Strategy - EXC 2075 – 390740016. We acknowledge the support by the Stuttgart Center for Simulation Science (SimTech).
