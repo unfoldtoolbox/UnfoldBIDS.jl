@@ -5,7 +5,7 @@
 # 
 # I.e. `run_unfold(dataDF, bfDict; extract_data = your_custom_function)` 
 #
-# By default `raw_to_data` is used.  
+# By default `raw_to_data` is used, if PyMNE is loaded.  
 # 
 # ```julia
 # function raw_to_data(raw; channels::AbstractVector{<:Union{String,Integer}}=[])
@@ -16,19 +16,21 @@
 # You can exchange this function through an arbitrary function (applying MNE processing as needed), as long as it takes the raw MNE data object and returns a pyconverted Julia Array containing the data stream. For example
 # 
 # ```julia
+# using PyMNE
+#
 # function raw_to_filtered_data(raw; channels::AbstractVector{<:Union{String,Integer}}=[], l_freq=0.5, h_freq=45)
 #
 #   # Load data into memory
-#   raw.load_data()
+#   loaded = raw.copy.load_data() # Make a copy to not modify original raw
 #
 #   # Re-reference to mastoids and add Cz back in
-#   UnfoldBIDS.PyMNE.add_reference_channels(raw, ref_channels=UnfoldBIDS.pylist(["Cz"]), copy=false)
-#   raw.set_eeg_reference(ref_channels=UnfoldBIDS.pylist(["RM", "LM"]))
+#   PyMNE.add_reference_channels(loaded, ref_channels=pylist(["Cz"]), copy=false)
+#   loaded.set_eeg_reference(ref_channels=pylist(["RM", "LM"]))
 # 
 #   # Filter data
-#   raw.filter(l_freq, h_freq, picks="eeg")
+#   loaded.filter(l_freq, h_freq, picks="eeg")
 #   
-#   return UnfoldBIDS.pyconvert(Array, raw.get_data(picks=UnfoldBIDS.pylist(channels), units="uV"))
+#   return pyconvert(Array, loaded.get_data(picks=pylist(channels), units="uV"))
 # end
 # ```
 # 

@@ -2,5 +2,8 @@
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 LazyArtifacts = "4af54fe1-eca0-43a8-85a7-787d91b784e3"
 Logging = "56ddb016-857b-54e1-b83d-db4d58db5568"
+PyMNE = "6c5003b2-cbe8-491c-a0d1-70088e6a0fd6"
+Term = "22787eb5-b846-44ae-b979-8e399b8463ab"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 Unfold = "181c99d8-e21b-4ff3-b70b-c233eddec679"
+UnicodePlots = "b8865327-cd53-5732-bb35-84acbb429228"

@@ -1,7 +1,7 @@
 name = "UnfoldBIDS"
 uuid = "b54e767b-1ebd-4480-ac2a-f5f4d8853074"
+version = "0.4.0"
 authors = ["Rene Skukies", "Benedikt Ehinger"]
-version = "0.3.4"
 
 [deps]
 Artifacts = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
@@ -12,10 +12,18 @@ DataFramesMeta = "1313f7d8-7da2-5740-9ea0-a2ca25f37964"
 LazyArtifacts = "4af54fe1-eca0-43a8-85a7-787d91b784e3"
 Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
 ProgressBars = "49802e3a-d2f1-5c88-81d8-b72133a6f568"
-PyMNE = "6c5003b2-cbe8-491c-a0d1-70088e6a0fd6"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 StatsModels = "3eaba693-59b7-5ba5-a881-562e759f1c8d"
 Unfold = "181c99d8-e21b-4ff3-b70b-c233eddec679"
+
+[weakdeps]
+PyMNE = "6c5003b2-cbe8-491c-a0d1-70088e6a0fd6"
+Term = "22787eb5-b846-44ae-b979-8e399b8463ab"
+UnicodePlots = "b8865327-cd53-5732-bb35-84acbb429228"
+
+[extensions]
+MNEext = "PyMNE"
+UnicodePlotsExt = ["UnicodePlots", "Term"]
 
 [compat]
 Artifacts = "1"
@@ -28,7 +36,9 @@ ProgressBars = "1.5"
 PyMNE = "0.1, 0.2"
 Statistics = "1.1"
 StatsModels = "0.6, 0.7"
+Term = "2.0.8"
 Unfold = "0.5, 0.6, 0.7, 0.8"
+UnicodePlots = "3.8.1"
 julia = "1.11"
 
 [extras]

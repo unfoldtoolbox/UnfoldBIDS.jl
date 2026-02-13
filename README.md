@@ -49,10 +49,11 @@ Pkg.add("UnfoldBIDS")
 
 ```julia
 using UnfoldBIDS
+using PyMNE
 ```
+> **Note:**    UnfoldBIDS.jl now shifted the use of PyMNE functionality to an extension. Make sure you have PyMNE loaded in case you want to use loading and preprocessing functionality. Alternatively, you can provide your own functionality.
 
 ### Look up the paths of all subjects and store in a Dataframe
-> **Note:**    UnfoldBIDS.jl currently only works on paths and filenames, but ignores information from `.json` files.
 
 ```julia
 layout_df = bids_layout(bidsPath::AbstractString; kwargs)
@@ -67,13 +68,14 @@ bidsPath::AbstractString; # Path to BIDS root folder
 - ses::Union{Nothing,AbstractString}=nothing: Specify session; will load all sessions if not specified
 - task::Union{Nothing,AbstractString}=nothing: Specify task; will load all tasks if not specified
 - run::Union{Nothing,AbstractString}=nothing): Specify run; will load all runs if not specified
-
 """
+> **Note:**    UnfoldBIDS.jl currently only works on paths and filenames, but ignores information from `.json` files.
+
 ```
 
 ### Load all data into memory/ one dataframe:           
 ```julia
-eeg_df = load_bids_eeg_data(layout_df; verbose::Bool=true, kwargs...)
+eeg_df = load_bids_eeg_data(layout_df)
 ```
 
 ### Run Unfold model 
