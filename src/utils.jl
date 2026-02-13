@@ -278,3 +278,4 @@ function erp_core_example()
     path = artifact"sample_BIDS"
     return path
 end
+
