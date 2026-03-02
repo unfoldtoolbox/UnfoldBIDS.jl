@@ -1,6 +1,6 @@
 name = "UnfoldBIDS"
 uuid = "b54e767b-1ebd-4480-ac2a-f5f4d8853074"
-version = "0.4.1"
+version = "0.4.2"
 authors = ["Rene Skukies", "Benedikt Ehinger"]
 
 [deps]
