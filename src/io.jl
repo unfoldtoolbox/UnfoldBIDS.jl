@@ -124,7 +124,7 @@ function load_results(bids_root::String;
 
     # Add additional information
     for path in all_paths
-        get_info!(files_df, path)
+        extract_subject_id!(files_df, path)
     end
 
     # Check for multiple session/tasks/runs
