@@ -149,7 +149,7 @@ function _load_results(files_df, generate_Xs::Bool = true)
     results_df = DataFrame()
     for row in eachrow(files_df)
         tmp_data = load(row.file, UnfoldModel, generate_Xs = generate_Xs);
-        tmp_df = DataFrame(subject=row.subject, ses=row.ses, task=row.task, run=row.run, data=tmp_data)
+        tmp_df = DataFrame(subject=row.subject, ses=row.ses, task=row.task, run=row.run, model=tmp_data)
 
         append!(results_df, tmp_df)
     end
