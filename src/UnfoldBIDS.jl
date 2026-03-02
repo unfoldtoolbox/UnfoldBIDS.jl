@@ -32,7 +32,7 @@ export FormulaTerm
 
 checkFun(sym) = Base.get_extension(@__MODULE__(), sym)
 function inspect_events(args...; kwargs...)
-    ext = checkFun(:UnfoldUnicodePlotsExt)
+    ext = checkFun(:UnicodePlotsExt)
     msg = "UnicodePlots and/or Term not loaded. Please use ]add UnicodePlots, Term, using UnicodePlots, Term to install them prior to using"
     isnothing(ext) ? throw(msg) : ext.inspect_events(args...; kwargs...)
 end
