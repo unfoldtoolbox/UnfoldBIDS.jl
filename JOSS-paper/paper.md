@@ -50,7 +50,7 @@ UnfoldBIDS is a pipeline package with a focus on facilitating the analysis of ma
 * Choice of language: Julia was chosen not only because of Unfold.jl is implemented in it, but also because it allows a simple modularity via functional programming and multiple dispatch. This allows for user to quickly replace e.g. data loaders with custom implementations as needed.
 * Reliance on established standards: UnfoldBIDS.jl relies on the BIDS format, making it a very general solution compatible with all BIDS-compliant neuroscience datasets
 * Dependency-Management: Dependencies and Semantic Versioning is ingrained within the Julia programming language and continuous integration automatically alerts when new incompatabilities arise. Large dependencies were made optional, implemented via PackageExtensions. Examples are the python-based PyMNE.jl or UnicodePlots.jl
-* We optimize the package for large dataset, e.g. replacing standard “walkdir” iterators with Continuables.jl generators. This allows to use UnfoldBIDS with BIDS datasets with hundreds of participants .
+* We optimize the package for large dataset, e.g. replacing standard `walkdir` iterators with Continuables.jl generators. This allows to use UnfoldBIDS with BIDS datasets with hundreds of participants .
 * Future modularity: Currently no established package exists to handle EEG data within Julia, which is why PyMNE is used as a default fallback for this task. However, users can provide their own package agnostic data handling (i.e. loading and potential pre-processing) functions, keeping UnfoldBIDS combinable with future Julia native EEG processing packages.
 
 # Comparison to existing packages
