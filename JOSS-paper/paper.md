@@ -44,6 +44,15 @@ For researchers not relying on a list of subject ID’s to look up subject-speci
 
 Before analysis, researchers often need to inspect metadata or verify data integrity. UnfoldBIDS.jl supports this by first loading all file paths and subject-level metadata into a tidy data frame, allowing users to inspect and filter datasets prior to EEG data loading and processing. In summary, UnfoldBIDS.jl provides a convenient interface for processing BIDS-compliant EEG data in the Julia programming language.
 
+# Software  Design
+
+UnfoldBIDS is a pipeline package with a focus on facilitating the analysis of many (large) datasets using the Unfold.jl package.
+- Choice of language: Julia was chosen not only because of Unfold.jl is implemented in it, but also because it allows a simple modularity via functional programming and multiple dispatch. This allows for user to quickly replace e.g. data loaders with custom implementations as needed.
+- Reliance on established standards: UnfoldBIDS.jl relies on the BIDS format, making it a very general solution compatible with all BIDS-compliant neuroscience datasets
+- Dependency-Management: Dependencies and Semantic Versioning is ingrained within the Julia programming language and continuous integration automatically alerts when new incompatabilities arise. Large dependencies were made optional, implemented via PackageExtensions. Examples are the python-based PyMNE.jl or UnicodePlots.jl
+- We optimize the package for large dataset, e.g. replacing standard “walkdir” iterators with Continuables.jl generators. This allows to use UnfoldBIDS with BIDS datasets with hundreds of participants .
+- Future modularity: Currently no established package exists to handle EEG data within Julia, which is why PyMNE is used as a default fallback for this task. However, users can provide their own package agnostic data handling (i.e. loading and potential pre-processing) functions, keeping UnfoldBIDS combinable with future Julia native EEG processing packages.
+
 # Comparison to existing packages
 There are currently no existing julia packages combining rERP analysis on BIDS datasets. As of January 2026 , the Julia programming language offers two packages specifically designed to handle BIDS structured data: [BIDSTools.jl](https://github.com/TRIImaging/BIDSTools.jl) and [BIDS.jl](https://github.com/Telepathy-Lab/BIDS.jl). However, BIDSTools.jl was last updated in 2020 and provides minimal documentation, while BIDS.jl was last updated in 2023 and lacks any documentation. Consequently, we consider neither package a valid option for handling BIDS dataset in the Julia programming language.
 
@@ -62,11 +71,18 @@ The resulting data frame structure enables easy inspection, filtering, and subse
 
 ## Pre-processing using MNE
 
-By default, UnfoldBIDS.jl assumes users have already preprocessed their data. However, researchers often want to quickly inspect raw data or different processing parameters. Here, UnfoldBIDS.jl offers a preprocessing hook, allowing for the integration of arbitrary MNE preprocessing functions like filtering or resampling (Gramfort et al., 2013; Larson et al., 2024).
+By default, UnfoldBIDS.jl assumes users have already preprocessed their data. However, researchers often want to quickly inspect raw data or different processing parameters. Here, UnfoldBIDS.jl offers a preprocessing hook, allowing for the integration of arbitrary MNE preprocessing functions like filtering or resampling (@gramfort.etal_2013a; @larson.etal_2024).
 
 # Summary
 
 UnfoldBIDS.jl bridges a critical gap in the neuroimaging tool-chain by enabling efficient, reproducible, and scalable rERP analysis of BIDS-compliant EEG data within the Julia ecosystem. By combining the benefits of the rERP framework with the standardization of BIDS and the performance of Julia, it empowers researchers to conduct rigorous, transparent, and automated analyses.
+
+# Research Impact Statement
+UnfoldBIDS has been used in one peer reviewed publication (@skukies.etal_2025a). Currently, the package is in use in several  other non-published projects, by ourselves and collaborators as far as we are aware of. BIDS structured datasets are clearly the future of data sharing in neuroscience, and with increasing dataset sites, more structured analysis pipelines are required.
+
+# AI Usage Disclosure
+The majority of the toolbox has been programmed without the use of AI. Parts however, have been modified with the help of the co-pilot integration of VS-Code, most notably several of the docstrings. No AI creation (either docstring or code suggestions) were used without quality verification and code review.
+
 
 # Conflict of Interests
 
