@@ -82,9 +82,6 @@ By default, UnfoldBIDS.jl assumes users have already preprocessed their data. Ho
 
 UnfoldBIDS.jl bridges a critical gap in the neuroimaging tool-chain by enabling efficient, reproducible, and scalable rERP analysis of BIDS-compliant EEG data within the Julia ecosystem. By combining the benefits of the rERP framework with the standardization of BIDS and the performance of Julia, it empowers researchers to conduct rigorous, transparent, and automated analyses.
 
-# Research Impact Statement
-UnfoldBIDS has been used in one peer reviewed publication [@skukies.etal_2025a]. Currently, the package is in use in several  other non-published projects, by ourselves and collaborators as far as we are aware of. BIDS structured datasets are clearly the future of data sharing in neuroscience, and with increasing dataset sites, more structured analysis pipelines are required.
-
 # AI Usage Disclosure
 The majority of the toolbox has been programmed without the use of AI. Parts however, have been modified with the help of the co-pilot integration of VS-Code, most notably several of the docstrings. No AI creation (either docstring or code suggestions) were used without quality verification and code review.
 
