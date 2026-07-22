@@ -3,19 +3,37 @@
 
 cff-version: 1.2.0
 title: UnfoldBIDS
-message: 'If you use this page, please cite it as below.'
+message: 'If you use this package, please cite our preprint below.'
 type: software
 authors:
-  - given-names: Benedikt
-    family-names: Ehinger
-    orcid: 'https://orcid.org/0000-0002-6276-3332'
   - given-names: René
     family-names: Skukies
     orcid: 'https://orcid.org/0000-0002-4124-4584'
-
+  - given-names: Benedikt
+    family-names: Ehinger
+    orcid: 'https://orcid.org/0000-0002-6276-3332'
 identifiers:
   - type: doi
-    #value: 10.5281/zenodo.6531996
+    value: 10.31234/osf.io/p4cu7_v1
+    description: The PsyArXiv deposit of the accompanying paper.
 repository-code: 'https://github.com/unfoldtoolbox/UnfoldBIDS.jl'
-#version: 0.3.5
-#date-released: '2023-10-24'
+abstract: >-
+  The increasing complexity of naturalistic experiments
+  requires advanced analytical methods, with the
+  regression-based event-related potential (rERP) framework
+  emerging as a promising tool for flexible, single-trial
+  EEG analysis. Alongside methodological progress, the Brain
+  Imaging Data Structure (BIDS) has revolutionized data
+  sharing by standardizing file organization and enabling
+  seamless integration across tools and pipelines. However,
+  bridging these advancements, rERP modeling and
+  BIDS-compliant datasets, typically requires cumbersome
+  custom scripting, limiting reproducibility and efficiency.
+    Here, we introduce UnfoldBIDS.jl, a Julia package that integrates BIDS-structured datasets with the rERP capabilities of Unfold.jl, streamlining the analysis of large-scale EEG datasets. The package simplifies analyses of BIDS-datasets, allows for preprocessing using MNE-python, returns tidy datasets for visualization or further statistical analysis and includes both documentation and tutorials.
+keywords:
+  - EEG
+  - ERP
+  - Unfold.jl
+  - BIDS
+  - Julia
+license: MIT
