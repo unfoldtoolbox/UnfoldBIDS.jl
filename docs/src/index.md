@@ -50,6 +50,11 @@ For researchers not relying on a subject list to look up subject-specific data, 
 
 Additionally, many researchers write their loading scripts using loops that load data directly and recursively into memory, which can slow down the process, especially with large datasets. UnfoldBIDS.jl overcomes this in two ways. First by forcing the user to initially load and inspect all paths, including subject specific data, to make sure only datasets are loaded that are actually needed. And second, by utilizing MNE's lazy loading function by default, ensuring that data is only loaded when necessary. In summary, UnfoldBIDS.jl provides a convenient interface for processing BIDS-compliant EEG data in the Julia programming language.
 
+## Citation
+
+If you use our package, please cite:
+
+René, S., & Ehinger, B. V. (2026, July 21). UnfoldBIDS.jl: Streamlining regression ERP Analysis of BIDS-Compliant EEG Data in Julia. Retrieved from osf.io/preprints/psyarxiv/p4cu7_v1
 
 ```@raw html
 <!---
