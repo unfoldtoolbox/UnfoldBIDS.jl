@@ -49,7 +49,7 @@ function save_results(results::DataFrame, bids_root::String;
         if !overwrite && !isfile(fullfile_path)
             save(fullfile_path, row.model; compress=true)
         elseif !overwrite && isfile(fullfile_path)
-            @warn("overwrite is set to false and I found a subject with already saved results in the folder $save_in
+            @warn("overwrite is set to false but a subject has already saved results in the folder $save_in
             If you're sure you want to overwrite this data, please set overwrite=true, skipping subject for now.
             Subject file: $file_name")
             continue
