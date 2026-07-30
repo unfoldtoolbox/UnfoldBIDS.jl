@@ -12,7 +12,7 @@ Example of path to saved file: `bids_root/derivatives/Unfold/sub-XXX/eeg/sub-XXX
 - `derivatives_subfolder::String = "Unfold"`\\
    Creates the named subfolder and saves Unfold models according to BIDS.
 - `overwrite::Union{Bool,String} = false`\\
-   Does not overwrite existing datasets; can be set to true. If set to a string, the string will be prepended to the filename of a saved subject model if it already exists.
+   Does not overwrite existing datasets, i.e. skips already existing datasets (according to subject specific datapath/filename) and give a warning; can be set to true in which case already existing data will be silently overwritten. If set to a string, the string will be prepended to the filename of a saved subject model if it already exists.
 """
 function save_results(results::DataFrame, bids_root::String;
     derivatives_subfolder::String="Unfold",
@@ -50,7 +50,7 @@ function save_results(results::DataFrame, bids_root::String;
             save(fullfile_path, row.model; compress=true)
         elseif !overwrite && isfile(fullfile_path)
             @warn("overwrite is set to false and I found a subject with already saved results in the folder $save_in
-            If you're sure you want to overwrite this data, please set overwrite=true   
+            If you're sure you want to overwrite this data, please set overwrite=true, skipping subject for now.
             Subject file: $file_name")
             continue
         elseif typeof(overwrite) == String && isfile(fullfile_path)
