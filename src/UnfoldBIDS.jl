@@ -30,10 +30,9 @@ export save_results, load_results
 import StatsModels.FormulaTerm # for exporting
 export FormulaTerm
 
-checkFun(sym) = Base.get_extension(@__MODULE__(), sym)
 function inspect_events(args...; kwargs...)
-    ext = checkFun(:UnicodePlotsExt)
-    msg = "UnicodePlots and/or Term not loaded. Please use ]add UnicodePlots, Term, using UnicodePlots, Term to install them prior to using"
+    ext = Base.get_extension(@__MODULE__, :UnicodePlotsExt)
+    msg = "UnicodePlots and/or Term not loaded. Please use ]add UnicodePlots, Term, using UnicodePlots, Term to install them prior to using `inspect_events()`."
     isnothing(ext) ? throw(msg) : ext.inspect_events(args...; kwargs...)
 end
 
